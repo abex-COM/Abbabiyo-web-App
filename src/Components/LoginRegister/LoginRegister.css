@@ -14,7 +14,7 @@
     transition: height .2s ease;
 }
 .wrapper.active{
-    height: 520px;
+    height: 620px;
 }
 .wrapper .form-box{
     width: 100%;
@@ -110,3 +110,16 @@ form .register-link{
 .register-link p a:hover{
     text-decoration: underline;
 }
+.link-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+ }
+ 
+ .link-button:hover {
+    text-decoration: none;
+ }

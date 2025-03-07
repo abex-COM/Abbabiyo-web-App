@@ -5,6 +5,7 @@ import './LoginRegister.css';
 
 const LoginRegister = () => {
    const [formData, setFormData] = useState({
+      fullname: '',
       username: '',
       email: '',
       password: '',
@@ -23,9 +24,23 @@ const LoginRegister = () => {
          console.log('Login successful:', res.data.token);
          localStorage.setItem('token', res.data.token);
          alert('Login successful!');
+          // Clear the input fields
+          setFormData({
+            fullName: '', 
+            username: '',
+            email: '',
+            password: '',
+         });
       } catch (err) {
          console.error('Login failed:', err.response?.data || err.message);
          alert('Login failed. Please check your credentials.');
+          // Clear the input fields
+          setFormData({
+            fullName: '', 
+            username: '',
+            email: '',
+            password: '',
+         });
       }
    };
 
@@ -33,12 +48,33 @@ const LoginRegister = () => {
       e.preventDefault();
       try {
          const res = await register(formData);
-         console.log('Registration successful:', res.data.token);
-         localStorage.setItem('token', res.data.token);
-         alert('Registration successful!');
+         console.log('Registration response:', res); // Log the full response
+   
+         // Check if the response contains a token
+         if (res.data && res.data.token) {
+            localStorage.setItem('token', res.data.token); // Store token in localStorage
+            alert('Registration successful!');
+   
+            // Clear the input fields
+            setFormData({
+               fullName: '', 
+               username: '',
+               email: '',
+               password: '',
+            });
+         } else {
+            throw new Error('Token not found in response');
+         }
       } catch (err) {
          console.error('Registration failed:', err.response?.data || err.message);
-         alert('Registration failed. Please try again.');
+         alert(err.response?.data?.message || 'Registration failed. Please try again.');
+          // Clear the input fields
+          setFormData({
+            fullName: '', 
+            username: '',
+            email: '',
+            password: '',
+         });
       }
    };
 
@@ -75,11 +111,11 @@ const LoginRegister = () => {
                </div>
                <div className="remember-forgot">
                   <label htmlFor=""><input type="checkbox" />Remember me</label>
-                  <a href="#">Forgot Password</a>
+                  Forgot Password
                </div>
                <button type="submit">Login</button>
                <div className="register-link">
-                 <p>Don't have an account? <a href="#" onClick={registerLink}>Register</a></p>
+                 <p>Don't have an account? <button type="button" className="link-button" onClick={registerLink}>Register</button></p>
                </div>
             </form>
          </div>
@@ -88,6 +124,17 @@ const LoginRegister = () => {
          <div className="form-box register">
             <form onSubmit={handleRegister}>
                <h1>Registration</h1>
+               <div className="input-box">
+                  <input
+                     type="text"
+                     placeholder="Full Name"
+                     name="fullName"
+                     value={formData.fullName}
+                     onChange={handleChange}
+                     required
+                  />
+                  <FaUser className="icon" />
+               </div>
                <div className="input-box">
                   <input
                      type="text"
@@ -128,7 +175,7 @@ const LoginRegister = () => {
                </div>
                <button type="submit">Register</button>
                <div className="register-link">
-                  <p>Already have an account? <a href="#" onClick={loginLink}>Login</a></p>
+                  <p>Already have an account? <button type="button" className="link-button" onClick={loginLink}>Login</button></p>
                </div>
             </form>
          </div>

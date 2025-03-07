@@ -6,7 +6,7 @@ const API_URL = 'http://localhost:5000/api/auth'; // Replace with your backend U
 const register = async (formData) => {
    try {
       const res = await axios.post(`${API_URL}/register`, formData);
-      return res.data;
+      return res; // Return the full response
    } catch (err) {
       throw err.response?.data || err.message;
    }
@@ -16,7 +16,7 @@ const register = async (formData) => {
 const login = async (formData) => {
    try {
       const res = await axios.post(`${API_URL}/login`, formData);
-      return res.data;
+      return res; // Return the full response
    } catch (err) {
       throw err.response?.data || err.message;
    }
