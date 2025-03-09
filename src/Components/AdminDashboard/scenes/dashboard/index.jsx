@@ -31,6 +31,10 @@ const Dashboard = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              borderRadius: "5px", // Add border radius
+              "&:hover": {
+                backgroundColor: colors.blueAccent[800], // Optional: Change background color on hover
+              },
             }}
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
@@ -53,6 +57,13 @@ const Dashboard = () => {
           display="flex"
           alignItems="center"
           justifyContent="center"
+          sx={{
+            borderRadius: "5px", // Add border radius
+            transition: "transform 0.3s ease", // Smooth transition
+            "&:hover": {
+              transform: "scale(1.05)", // Scale up on hover
+            },
+          }}
         >
           <StatBox
             title="12,361"
@@ -72,6 +83,13 @@ const Dashboard = () => {
           display="flex"
           alignItems="center"
           justifyContent="center"
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
         >
           <StatBox
             title="431,225"
@@ -91,6 +109,13 @@ const Dashboard = () => {
           display="flex"
           alignItems="center"
           justifyContent="center"
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
         >
           <StatBox
             title="32,441"
@@ -110,6 +135,13 @@ const Dashboard = () => {
           display="flex"
           alignItems="center"
           justifyContent="center"
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
         >
           <StatBox
             title="1,325,134"
@@ -129,11 +161,18 @@ const Dashboard = () => {
           gridColumn="span 8"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.02)", // Slightly smaller scale for larger boxes
+            },
+          }}
         >
           <Box
             mt="25px"
             p="0 30px"
-            display="flex "
+            display="flex"
             justifyContent="space-between"
             alignItems="center"
           >
@@ -170,6 +209,13 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           overflow="auto"
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.02)",
+            },
+          }}
         >
           <Box
             display="flex"
@@ -222,6 +268,13 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           p="30px"
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.02)",
+            },
+          }}
         >
           <Typography variant="h5" fontWeight="600">
             Campaign
@@ -247,6 +300,13 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.02)",
+            },
+          }}
         >
           <Typography
             variant="h5"
@@ -264,6 +324,13 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           padding="30px"
+          sx={{
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.02)",
+            },
+          }}
         >
           <Typography
             variant="h5"

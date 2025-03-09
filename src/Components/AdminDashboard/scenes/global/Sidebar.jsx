@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar'; // Updated import
-import 'react-pro-sidebar/dist/css/styles.css'; // Ensure this import is correct
+import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
+import 'react-pro-sidebar/dist/css/styles.css';
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -17,33 +16,68 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  // Map the title to the correct view name
+  const getViewName = (title) => {
+    switch (title) {
+      case "Manage Team":
+        return "Team";
+      case "Contacts Information":
+        return "Contacts";
+      case "Invoices Balances":
+        return "Invoices";
+      case "Profile Form":
+        return "Form";
+      case "FAQ Page":
+        return "FAQ";
+      case "Bar Chart":
+        return "Bar";
+      case "Pie Chart":
+        return "Pie";
+      case "Line Chart":
+        return "Line";
+      case "Geography Chart":
+        return "Geography";
+      default:
+        return title; // For "Dashboard" and "Calendar"
+    }
+  };
+
   return (
     <MenuItem
       active={selected === title}
       style={{
         color: colors.grey[100],
       }}
-      onClick={() => setSelected(title)}
+      onClick={() => {
+        setSelected(title);
+        setCurrentView(getViewName(title)); // Update the current view
+      }}
       icon={icon}
     >
       <Typography>{title}</Typography>
-      <Link to={to} />
     </MenuItem>
   );
 };
 
-const SidebarComponent = () => {
+const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
   return (
     <Box
       sx={{
+        position: "fixed", // Fix the sidebar position
+        left: 0,
+        top: 0,
+        height: "100vh", // Full height of the viewport
+        zIndex: 1000, // Ensure the sidebar is above other content
+        width: isCollapsed ? "80px" : "270px", // Adjust width when collapsed
+        transition: "width 0.3s ease", // Smooth transition
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
@@ -61,7 +95,7 @@ const SidebarComponent = () => {
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}> {/* Updated from Sidebar to ProSidebar */}
+      <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
@@ -80,12 +114,23 @@ const SidebarComponent = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                  Admin
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <IconButton
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  sx={{ zIndex: 1000 }} // Set z-index for the toggle button
+                >
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
+            )}
+            {isCollapsed && (
+              <IconButton
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                sx={{ zIndex: 1000 }} // Set z-index for the toggle button
+              >
+                <MenuOutlinedIcon />
+              </IconButton>
             )}
           </MenuItem>
 
@@ -107,10 +152,10 @@ const SidebarComponent = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Ed Roh
+                  Fira Teferi
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  VP Fancy Admin
+                  System Admin
                 </Typography>
               </Box>
             </Box>
@@ -119,10 +164,10 @@ const SidebarComponent = () => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/admin"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
 
             <Typography
@@ -134,24 +179,24 @@ const SidebarComponent = () => {
             </Typography>
             <Item
               title="Manage Team"
-              to="/team" // Ensure this matches the route path
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="Contacts Information"
-              to="/contacts" // Ensure this matches the route path
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="Invoices Balances"
-              to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
 
             <Typography
@@ -163,24 +208,24 @@ const SidebarComponent = () => {
             </Typography>
             <Item
               title="Profile Form"
-              to="/form"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="Calendar"
-              to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="FAQ Page"
-              to="/faq"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
 
             <Typography
@@ -192,37 +237,37 @@ const SidebarComponent = () => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="/bar"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="Pie Chart"
-              to="/pie"
               icon={<PieChartOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="Line Chart"
-              to="/line"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
             <Item
               title="Geography Chart"
-              to="/geography"
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              setCurrentView={setCurrentView}
             />
           </Box>
         </Menu>
-      </ProSidebar> {/* Updated from Sidebar to ProSidebar */}
+      </ProSidebar>
     </Box>
   );
 };
 
-export default SidebarComponent;
+export default Sidebar;
