@@ -130,8 +130,7 @@ form button.router:hover{
     border-radius: 50%;
 }
 .theme-toggle:hover{
-    border: 1px solid #e0e0e0;
-    background: #1e2f50;
+    border:  2px solid #4cceac;
 }
 form .remember-forgot{
     display: flex;
