@@ -371,8 +371,6 @@ const LoginRegister = () => {
               {translations[language].register}
             </button>
 
-
-{/* Register Form  */}
             <div className="register-link">
               <p>
                 {translations[language].haveAccount}{' '}

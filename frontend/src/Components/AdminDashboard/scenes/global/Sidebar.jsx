@@ -141,7 +141,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
+                  src={`../../assets/default.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
