@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
@@ -15,7 +15,8 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import defaultProfilePic from "../../assets/default.png";
+import axios from "axios";
+import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
 
 const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
   const theme = useTheme();
@@ -68,6 +69,28 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
+  const [user, setUser] = useState(null); // State to store user data
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from JWT
+
+      try {
+        const response = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data.user); // Update state with user data
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <Box
@@ -135,6 +158,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             )}
           </MenuItem>
 
+          {/* USER PROFILE SECTION */}
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
@@ -142,7 +166,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={defaultProfilePic} // Updated image path
+                  src={user?.profileImage ? `/uploads/${user.profileImage}` : defaultProfilePic} // Use imported defaultProfilePic
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
@@ -153,7 +177,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Fira Teferi
+                  {user?.fullName || "Fira Teferi"}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   System Admin
@@ -162,7 +186,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             </Box>
           )}
 
+          {/* MENU ITEMS */}
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+            {/* Dashboard */}
             <Item
               title="Dashboard"
               icon={<HomeOutlinedIcon />}
@@ -171,6 +197,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setCurrentView={setCurrentView}
             />
 
+            {/* DATA SECTION */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -200,6 +227,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setCurrentView={setCurrentView}
             />
 
+            {/* PAGES SECTION */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -229,6 +257,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setCurrentView={setCurrentView}
             />
 
+            {/* CHARTS SECTION */}
             <Typography
               variant="h6"
               color={colors.grey[300]}

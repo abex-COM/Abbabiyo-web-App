@@ -1,30 +1,58 @@
 const express = require('express');
-const { register, login } = require('../controllers/authController');
-const upload = require('../middleware/upload');
-const path = require('path');
-
 const router = express.Router();
+const authController = require('../controllers/authController');
+const upload = require('../middleware/upload'); // Import multer middleware
+const User = require('../models/User');
 
-// Register route
-router.post('/register', register);
+// Existing routes...
+router.post('/register', authController.register);
+router.post('/login', authController.login);
 
-// Login route
-router.post('/login', login);
+// New route for updating profile
+router.put('/update-profile/:id', upload.single('profileImage'), async (req, res) => {
+   const { id } = req.params;
+   const { fullName, username, email, password } = req.body;
+   const profileImage = req.file ? req.file.filename : null;
 
-// Upload profile image
-router.post('/upload', upload.single('image'), (req, res) => {
-   if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+   try {
+      const user = await User.findById(id);
+
+      if (!user) {
+         return res.status(404).json({ message: 'User not found' });
+      }
+
+      user.fullName = fullName || user.fullName;
+      user.username = username || user.username;
+      user.email = email || user.email;
+      user.profileImage = profileImage || user.profileImage;
+
+      if (password) {
+         user.password = password;
+      }
+
+      await user.save();
+
+      res.status(200).json({ message: 'Profile updated successfully', user });
+   } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
    }
-   res.status(200).json({ message: 'File uploaded successfully', file: req.file });
 });
 
-// Fetch profile image
-router.get('/image/:filename', (req, res) => {
-   const filename = req.params.filename;
-   const filePath = path.join(__dirname, '../uploads', filename);
+// New route for fetching user data
+router.get('/user/:id', async (req, res) => {
+   const { id } = req.params;
 
-   res.sendFile(filePath);
+   try {
+      const user = await User.findById(id);
+
+      if (!user) {
+         return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.status(200).json({ user });
+   } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
+   }
 });
 
 module.exports = router;
