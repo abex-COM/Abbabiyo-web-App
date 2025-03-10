@@ -31,7 +31,7 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
         return "Contacts";
       case "Invoices Balances":
         return "Invoices";
-      case "Profile Form":
+      case "Create User":
         return "Form";
       case "FAQ Page":
         return "FAQ";
@@ -249,7 +249,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               Pages
             </Typography>
             <Item
-              title="Profile Form"
+              title="Create User"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

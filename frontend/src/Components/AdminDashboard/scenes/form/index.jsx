@@ -3,17 +3,30 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import axios from "axios";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
+  const handleFormSubmit = async (values, { resetForm }) => {
+    try {
+      // Send a POST request to the backend to create a new farmer
+      const response = await axios.post("http://localhost:5000/api/farmers/register", values);
+      console.log("Farmer created:", response.data);
+      alert("Farmer created successfully!");
+
+      // Clear the form fields after successful registration
+      resetForm();
+    } catch (error) {
+      console.error("Error creating farmer:", error.response?.data || error.message);
+      alert("Failed to create farmer. Please try again.");
+      resetForm();
+    }
   };
 
   return (
     <Box m="20px">
-      <Header title="CREATE USER" subtitle="Create a New User Profile" />
+      <Header title="CREATE FARMER" subtitle="Create a New Farmer Profile" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -27,6 +40,7 @@ const Form = () => {
           handleBlur,
           handleChange,
           handleSubmit,
+          resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -37,32 +51,37 @@ const Form = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
+              {/* Full Name */}
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="First Name"
+                label="Full Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.firstName}
-                name="firstName"
-                error={!!touched.firstName && !!errors.firstName}
-                helperText={touched.firstName && errors.firstName}
-                sx={{ gridColumn: "span 2" }}
+                value={values.fullName}
+                name="fullName"
+                error={!!touched.fullName && !!errors.fullName}
+                helperText={touched.fullName && errors.fullName}
+                sx={{ gridColumn: "span 4" }}
               />
+
+              {/* Username */}
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Last Name"
+                label="Username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.lastName}
-                name="lastName"
-                error={!!touched.lastName && !!errors.lastName}
-                helperText={touched.lastName && errors.lastName}
-                sx={{ gridColumn: "span 2" }}
+                value={values.username}
+                name="username"
+                error={!!touched.username && !!errors.username}
+                helperText={touched.username && errors.username}
+                sx={{ gridColumn: "span 4" }}
               />
+
+              {/* Email */}
               <TextField
                 fullWidth
                 variant="filled"
@@ -76,49 +95,80 @@ const Form = () => {
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 4" }}
               />
+
+              {/* Password */}
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="Contact Number"
+                type="password"
+                label="Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.contact}
-                name="contact"
-                error={!!touched.contact && !!errors.contact}
-                helperText={touched.contact && errors.contact}
+                value={values.password}
+                name="password"
+                error={!!touched.password && !!errors.password}
+                helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
+
+              {/* Farm Name */}
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Address 1"
+                label="Farm Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address1}
-                name="address1"
-                error={!!touched.address1 && !!errors.address1}
-                helperText={touched.address1 && errors.address1}
+                value={values.farmName}
+                name="farmName"
+                error={!!touched.farmName && !!errors.farmName}
+                helperText={touched.farmName && errors.farmName}
                 sx={{ gridColumn: "span 4" }}
               />
+
+              {/* Location */}
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Address 2"
+                label="Location"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address2}
-                name="address2"
-                error={!!touched.address2 && !!errors.address2}
-                helperText={touched.address2 && errors.address2}
+                value={values.location}
+                name="location"
+                error={!!touched.location && !!errors.location}
+                helperText={touched.location && errors.location}
+                sx={{ gridColumn: "span 4" }}
+              />
+
+              {/* Crops (Comma-separated) */}
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Crops (Comma-separated)"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.crops}
+                name="crops"
+                error={!!touched.crops && !!errors.crops}
+                helperText={touched.crops && errors.crops}
                 sx={{ gridColumn: "span 4" }}
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
-                Create New User
+              <Button
+                type="submit"
+                color="secondary"
+                variant="contained"
+                sx={{
+                  "&:hover": {
+                    transform: "none", // Disable size increase on hover
+                    backgroundColor: "secondary.main", // Keep the same background color on hover
+                  },
+                }}
+              >
+                Create New Farmer
               </Button>
             </Box>
           </form>
@@ -128,27 +178,29 @@ const Form = () => {
   );
 };
 
-const phoneRegExp =
-  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
+// Validation Schema
 const checkoutSchema = yup.object().shape({
-  firstName: yup.string().required("required"),
-  lastName: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  contact: yup
+  fullName: yup
     .string()
-    .matches(phoneRegExp, "Phone number is not valid")
-    .required("required"),
-  address1: yup.string().required("required"),
-  address2: yup.string().required("required"),
+    .required("Full Name is required")
+    .matches(/^[A-Za-z\s]+$/, "Full Name must contain only alphabetic characters and spaces"),
+  username: yup.string().required("Username is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup.string().required("Password is required"),
+  farmName: yup.string().required("Farm Name is required"),
+  location: yup.string().required("Location is required"),
+  crops: yup.string().required("Crops are required"),
 });
+
+// Initial Values
 const initialValues = {
-  firstName: "",
-  lastName: "",
+  fullName: "",
+  username: "",
   email: "",
-  contact: "",
-  address1: "",
-  address2: "",
+  password: "",
+  farmName: "",
+  location: "",
+  crops: "",
 };
 
 export default Form;
