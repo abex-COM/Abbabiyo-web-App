@@ -2,11 +2,14 @@ import { Box, Typography, TextField, Button, useTheme, IconButton } from "@mui/m
 import { tokens } from "../../theme";
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
 
 const EditProfile = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  // State for form data
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -16,15 +19,42 @@ const EditProfile = () => {
     profileImage: null,
   });
 
+  // State for user data fetched from the backend
+  const [user, setUser] = useState(null);
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+  
+      const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from JWT
+  
+      try {
+        const response = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data.user); // Update state with user data
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  
+    fetchUserData();
+  }, []);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle file upload
   const handleFileChange = (e) => {
     setFormData({ ...formData, profileImage: e.target.files[0] });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -80,20 +110,23 @@ const EditProfile = () => {
 
       {/* Profile Picture Upload */}
       <Box display="flex" alignItems="center" gap="20px" mb="20px">
-        <Box
-          width="100px"
-          height="100px"
-          borderRadius="50%"
-          bgcolor={colors.primary[400]}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          overflow="hidden"
-        >
-          <Typography variant="h6" color={colors.grey[100]}>
-            No Image
-          </Typography>
-        </Box>
+         <Box
+            width="100px"
+            height="100px"
+            borderRadius="50%"
+            overflow="hidden"
+            border={`2px solid ${colors.greenAccent[500]}`}
+          >
+            <img
+              alt="profile-user"
+              src={user?.profileImage ? `/uploads/${user.profileImage}` : defaultProfilePic}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </Box>
         <IconButton
           component="label"
           sx={{

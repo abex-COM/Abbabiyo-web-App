@@ -69,7 +69,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
-  const [user, setUser] = useState(null); // State to store user data
+  const [user, setUser] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    profileImage: "default.png", // Default profile image
+  });
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -83,7 +88,15 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
         const response = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(response.data.user); // Update state with user data
+
+        // Update state with user data
+        setUser(response.data.user);
+
+        // Log the image path for debugging
+        console.log(
+          "Image Path:",
+          response.data.user?.profileImage ? `/uploads/${response.data.user.profileImage}` : defaultProfilePic
+        );
       } catch (err) {
         console.error(err);
       }
@@ -166,7 +179,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={user?.profileImage ? `/uploads/${user.profileImage}` : defaultProfilePic} // Use imported defaultProfilePic
+                  src={user?.profileImage ? `/uploads/${user.profileImage}` : defaultProfilePic}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
