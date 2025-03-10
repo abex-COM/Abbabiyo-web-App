@@ -15,6 +15,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import defaultProfilePic from "../../assets/default.png";
 
 const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
   const theme = useTheme();
@@ -141,7 +142,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/default.png`}
+                  src={defaultProfilePic} // Updated image path
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>

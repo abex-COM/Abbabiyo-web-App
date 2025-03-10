@@ -1,3 +1,4 @@
+// AdminDashboard.jsx
 import { useState, useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
@@ -14,23 +15,23 @@ import Pie from "./scenes/pie";
 import FAQ from "./scenes/faq";
 import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar/calendar";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { useNavigate } from "react-router-dom";
+import EditProfile from "./scenes/editProfile"; // Import the new EditProfile component
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [theme, colorMode] = useMode();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Track sidebar collapse state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentView, setCurrentView] = useState("Dashboard");
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication state
-  const navigate = useNavigate(); // Hook for navigation
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
-  // Check for authentication on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/"); // Redirect to login if no token is found
+      navigate("/");
     } else {
-      setIsAuthenticated(true); // Set authenticated to true if token exists
+      setIsAuthenticated(true);
     }
   }, [navigate]);
 
@@ -58,14 +59,15 @@ const AdminDashboard = () => {
         return <Line />;
       case "Geography":
         return <Geography />;
+      case "EditProfile":
+        return <EditProfile />; // Render the EditProfile component
       default:
         return <Dashboard />;
     }
   };
 
-  // Render the dashboard only if authenticated
   if (!isAuthenticated) {
-    return null; // Render nothing until authentication is confirmed
+    return null;
   }
 
   return (
@@ -73,7 +75,6 @@ const AdminDashboard = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-          {/* Pass isCollapsed and setIsCollapsed to Sidebar */}
           <Sidebar
             isCollapsed={isSidebarCollapsed}
             setIsCollapsed={setIsSidebarCollapsed}
@@ -82,11 +83,11 @@ const AdminDashboard = () => {
           <main
             className="content"
             style={{
-              marginLeft: isSidebarCollapsed ? "80px" : "270px", // Dynamic margin
-              transition: "margin 0.3s ease", // Smooth transition
+              marginLeft: isSidebarCollapsed ? "80px" : "270px",
+              transition: "margin 0.3s ease",
             }}
           >
-            <Topbar setIsSidebar={setIsSidebarCollapsed} />
+            <Topbar setCurrentView={setCurrentView} />
             {renderView()}
           </main>
         </div>
