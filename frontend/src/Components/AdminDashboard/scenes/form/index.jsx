@@ -4,6 +4,8 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -13,19 +15,30 @@ const Form = () => {
       // Send a POST request to the backend to create a new farmer
       const response = await axios.post("http://localhost:5000/api/farmers/register", values);
       console.log("Farmer created:", response.data);
-      alert("Farmer created successfully!");
-
+      toast.success("Farmer created successfully!");
       // Clear the form fields after successful registration
       resetForm();
     } catch (error) {
       console.error("Error creating farmer:", error.response?.data || error.message);
-      alert("Failed to create farmer. Please try again.");
+      toast.error("Failed to create farmer. Please try again.");
       resetForm();
     }
   };
 
   return (
     <Box m="20px">
+      {/* Toast Container */}
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
       <Header title="CREATE FARMER" subtitle="Create a New Farmer Profile" />
 
       <Formik

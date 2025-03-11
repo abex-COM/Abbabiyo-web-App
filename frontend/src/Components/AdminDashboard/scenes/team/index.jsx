@@ -6,6 +6,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
 
 // Edit Farmer Modal Component
 const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
@@ -158,13 +160,13 @@ const Team = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFarmers(farmers.filter((farmer) => farmer._id !== id)); // Remove the deleted farmer from the list
-      alert("Farmer deleted successfully!");
+      toast.success("Farmer deleted successfully!");
     } catch (error) {
       console.error("Error deleting farmer:", error);
       if (error.response) {
         console.error("Error details:", error.response.data); // Log the full error response
       }
-      alert("Failed to delete farmer. Please try again.");
+      toast.error("Failed to delete farmer. Please try again.");
     }
   };
 
@@ -193,13 +195,13 @@ const Team = () => {
         )
       );
 
-      alert("Farmer updated successfully!");
+      toast.success("Farmer updated successfully!");
     } catch (error) {
       console.error("Error updating farmer:", error);
       if (error.response) {
         console.error("Error details:", error.response.data); // Log the full error response
       }
-      alert("Failed to update farmer. Please try again.");
+      toast.error("Failed to update farmer. Please try again.");
     }
   };
 
@@ -269,6 +271,18 @@ const Team = () => {
 
   return (
     <Box m="20px">
+           {/* Toast Container */}
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
       <Header title="FARMERS" subtitle="Managing the Farmers" />
       <Box
         m="40px 0 0 0"

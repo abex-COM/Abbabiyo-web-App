@@ -185,8 +185,10 @@ const LoginRegister = () => {
     try {
       const res = await register(formData);
       console.log('Registration response:', res);
+  
+      // Ensure the response contains a token
       if (res.data && res.data.token) {
-        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('token', res.data.token); // Save token to localStorage
         toast.success('Registration successful!', {
           position: "top-right",
           autoClose: 3000,
@@ -195,17 +197,23 @@ const LoginRegister = () => {
           pauseOnHover: true,
           draggable: true,
         });
+        // Reset form data
         setFormData({
           fullName: '',
           username: '',
           email: '',
           password: '',
         });
+
+        window.location.reload();
+        
       } else {
         throw new Error('Token not found in response');
       }
     } catch (err) {
       console.error('Registration failed:', err.response?.data || err.message);
+  
+      // Display error message to the user
       toast.error(err.response?.data?.message || 'Registration failed. Please try again.', {
         position: "top-right",
         autoClose: 3000,
@@ -214,6 +222,8 @@ const LoginRegister = () => {
         pauseOnHover: true,
         draggable: true,
       });
+  
+      // Reset form data in case of error
       setFormData({
         fullName: '',
         username: '',

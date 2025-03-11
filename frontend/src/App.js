@@ -1,16 +1,30 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginRegister from './Components/LoginRegister/LoginRegister';
-import AdminDashboard from './Components/AdminDashboard/AdminDashboard'; // Create this comnlkdlflsdjflkdsfldnbmponent for the admin dashboard
+import AdminDashboard from './Components/AdminDashboard/AdminDashboard';
 
 function App() {
-   return (
-      <Router>
-         <Routes>
-            <Route path="/" element={<LoginRegister />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-         </Routes>
-      </Router>
-   );
+  // Helper function to check if the user is authenticated
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    return !!token; // Returns true if token exists, false otherwise
+  };
+
+  return (
+    <Router>
+      <Routes>
+        {/* Login/Register Page */}
+        <Route path="/" element={<LoginRegister />} />
+
+        {/* Admin Dashboard (Protected Route) */}
+        <Route
+          path="/admin"
+          element={isAuthenticated() ? <AdminDashboard /> : <Navigate to="/" />}
+        />
+
+        <Route path="/register" element={<LoginRegister />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
