@@ -43,6 +43,8 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
         return "Line";
       case "Geography Chart":
         return "Geography";
+      case "Manage Admins": // Add this case
+        return "ManageAdmins";
       default:
         return title; // For "Dashboard" and "Calendar"
     }
@@ -288,6 +290,17 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setSelected={setSelected}
               setCurrentView={setCurrentView}
             />
+
+            {/* Add "Manage Admins" for Super Admin */}
+            {user?.role === 'superadmin' && (
+              <Item
+                title="Manage Admins"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                setCurrentView={setCurrentView}
+              />
+            )}
 
             {/* CHARTS SECTION */}
             <Typography

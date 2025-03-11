@@ -1,4 +1,3 @@
-// AdminDashboard.jsx
 import { useState, useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
@@ -16,7 +15,8 @@ import FAQ from "./scenes/faq";
 import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
-import EditProfile from "./scenes/editProfile"; // Import the new EditProfile component
+import EditProfile from "./scenes/editProfile";
+import ManageAdmins from "./scenes/manageAdmins"; // Import the ManageAdmins component
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -60,7 +60,9 @@ const AdminDashboard = () => {
       case "Geography":
         return <Geography />;
       case "EditProfile":
-        return <EditProfile />; // Render the EditProfile component
+        return <EditProfile />;
+      case "ManageAdmins": // Add this case
+        return <ManageAdmins />;
       default:
         return <Dashboard />;
     }

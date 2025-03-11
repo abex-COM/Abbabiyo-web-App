@@ -11,62 +11,96 @@ const path = require('path'); // Import path to handle file paths
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 
+// New route for registering a superadmin (for development purposes only)
+router.post('/register-superadmin', async (req, res) => {
+  const { fullName, username, email, password } = req.body;
+
+  try {
+    // Check if the user already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username or email already exists' });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create the superadmin user
+    const superadmin = new User({
+      fullName,
+      username,
+      email,
+      password: hashedPassword,
+      role: 'superadmin', // Explicitly set the role to 'superadmin'
+      profileImage: 'default.png',
+    });
+
+    await superadmin.save();
+
+    res.status(201).json({ message: 'Superadmin created successfully', superadmin });
+  } catch (err) {
+    console.error("Error creating superadmin:", err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 // New route for updating profile
 router.put('/update-profile/:id', upload.single('profileImage'), async (req, res) => {
-   const { id } = req.params;
-   const { fullName, username, email, password } = req.body;
-   const profileImage = req.file ? req.file.filename : null;
+  const { id } = req.params;
+  const { fullName, username, email, password } = req.body;
+  const profileImage = req.file ? req.file.filename : null;
 
-   try {
-      const user = await User.findById(id);
+  try {
+    const user = await User.findById(id);
 
-      if (!user) {
-         return res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // If a new profile image is uploaded, delete the old one (if it exists)
+    if (profileImage && user.profileImage && user.profileImage !== 'default.png') {
+      const oldImagePath = path.join(__dirname, '..', 'uploads', user.profileImage);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath); // Delete the old image file
       }
+    }
 
-      // If a new profile image is uploaded, delete the old one (if it exists)
-      if (profileImage && user.profileImage && user.profileImage !== 'default.png') {
-         const oldImagePath = path.join(__dirname, '..', 'uploads', user.profileImage);
-         if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath); // Delete the old image file
-         }
-      }
+    // Update user fields
+    user.fullName = fullName || user.fullName;
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.profileImage = profileImage || user.profileImage; // Update the profile image field
 
-      // Update user fields
-      user.fullName = fullName || user.fullName;
-      user.username = username || user.username;
-      user.email = email || user.email;
-      user.profileImage = profileImage || user.profileImage; // Update the profile image field
+    if (password) {
+      // Hash the new password before saving it
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
 
-      if (password) {
-         // Hash the new password before saving it
-         const salt = await bcrypt.genSalt(10);
-         user.password = await bcrypt.hash(password, salt);
-      }
+    await user.save();
 
-      await user.save();
-
-      res.status(200).json({ message: 'Profile updated successfully', user });
-   } catch (err) {
-      res.status(500).json({ message: 'Server error', error: err.message });
-   }
+    res.status(200).json({ message: 'Profile updated successfully', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 });
 
 // New route for fetching user data
 router.get('/user/:id', async (req, res) => {
-   const { id } = req.params;
+  const { id } = req.params;
 
-   try {
-      const user = await User.findById(id);
+  try {
+    const user = await User.findById(id);
 
-      if (!user) {
-         return res.status(404).json({ message: 'User not found' });
-      }
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-      res.status(200).json({ user });
-   } catch (err) {
-      res.status(500).json({ message: 'Server error', error: err.message });
-   }
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 });
 
 module.exports = router;

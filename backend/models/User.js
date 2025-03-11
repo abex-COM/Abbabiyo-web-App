@@ -1,6 +1,5 @@
-// backend/models/User.js
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // or bcryptjs
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
@@ -8,6 +7,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profileImage: { type: String, default: 'default.png' },
+  role: { type: String, enum: ['superadmin', 'admin', 'user'], default: 'user' }, // Add role field
 });
 
 // Hash the password before saving the user
