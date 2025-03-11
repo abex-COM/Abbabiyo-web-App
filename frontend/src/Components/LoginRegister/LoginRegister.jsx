@@ -5,6 +5,8 @@ import { MdOutlineLanguage } from "react-icons/md";
 import { TiWeatherSunny } from "react-icons/ti";
 import { register, login } from './api';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './LoginRegister.css';
 import { tokens } from './theme';
 
@@ -150,9 +152,24 @@ const LoginRegister = () => {
       console.log('Login successful:', res.data.token);
       localStorage.setItem('token', res.data.token);
       navigate('/admin');
+      toast.success('Login successful!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (err) {
       console.error('Login failed:', err.response?.data || err.message);
-      alert('Login failed. Please check your credentials.');
+      toast.error('Login failed. Please check your credentials.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setFormData({
         fullName: '',
@@ -170,7 +187,14 @@ const LoginRegister = () => {
       console.log('Registration response:', res);
       if (res.data && res.data.token) {
         localStorage.setItem('token', res.data.token);
-        alert('Registration successful!');
+        toast.success('Registration successful!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         setFormData({
           fullName: '',
           username: '',
@@ -182,7 +206,14 @@ const LoginRegister = () => {
       }
     } catch (err) {
       console.error('Registration failed:', err.response?.data || err.message);
-      alert(err.response?.data?.message || 'Registration failed. Please try again.');
+      toast.error(err.response?.data?.message || 'Registration failed. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setFormData({
         fullName: '',
         username: '',
@@ -192,6 +223,7 @@ const LoginRegister = () => {
     }
   };
 
+  
   const registerLink = () => setAction(' active');
   const loginLink = () => setAction('');
 
@@ -387,6 +419,7 @@ const LoginRegister = () => {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

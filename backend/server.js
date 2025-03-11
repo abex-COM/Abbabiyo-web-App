@@ -13,9 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json()); // Parse JSON request bodies
 
-// Serve static files from the 'uploads' directory
 app.use('/uploads', express.static('uploads'));
-
 // Connect to MongoDB
 connectDB();
 

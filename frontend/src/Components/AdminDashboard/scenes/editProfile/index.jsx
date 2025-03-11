@@ -6,6 +6,8 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import axios from "axios";
 import { useState, useEffect } from "react";
 import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
+import { ToastContainer, toast } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
 
 const EditProfile = () => {
   const theme = useTheme();
@@ -19,9 +21,9 @@ const EditProfile = () => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
       if (!token) return;
-  
+
       const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from JWT
-  
+
       try {
         const response = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -29,9 +31,10 @@ const EditProfile = () => {
         setUser(response.data.user); // Update state with user data
       } catch (err) {
         console.error(err);
+        toast.error("Failed to fetch user data"); // Toast for error
       }
     };
-  
+
     fetchUserData();
   }, []);
 
@@ -39,7 +42,7 @@ const EditProfile = () => {
   const handleFormSubmit = async (values, { resetForm }) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You must be logged in to update your profile.");
+      toast.error("You must be logged in to update your profile."); // Toast for error
       return;
     }
 
@@ -53,7 +56,7 @@ const EditProfile = () => {
       formDataToSend.append("password", values.password);
     }
     if (values.profileImage) {
-      formDataToSend.append("profileImage", values.profileImage);
+      formDataToSend.append("profileImage", values.profileImage); // Append the file object
     }
 
     try {
@@ -68,23 +71,42 @@ const EditProfile = () => {
         }
       );
 
-      alert(response.data.message);
+      toast.success(response.data.message); // Toast for success
+
+      // Refetch user data to update the state
+      const updatedUserResponse = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(updatedUserResponse.data.user);
 
       // Clear inputs after successful update
       resetForm();
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Failed to update profile.");
+      toast.error(err.response?.data?.message || "Failed to update profile."); // Toast for error
     }
   };
 
   return (
     <Box m="20px">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       {/* Title */}
-      <Typography 
-        variant="h3" 
-        color={colors.grey[100]} 
-        fontWeight="bold" 
+      <Typography
+        variant="h3"
+        color={colors.grey[100]}
+        fontWeight="bold"
         sx={{ mb: "20px" }}
       >
         Edit Profile
@@ -92,23 +114,27 @@ const EditProfile = () => {
 
       {/* Profile Picture Upload */}
       <Box display="flex" alignItems="center" gap="20px" mb="20px">
-         <Box
-            width="100px"
-            height="100px"
-            borderRadius="50%"
-            overflow="hidden"
-            border={`2px solid ${colors.greenAccent[500]}`}
-          >
-            <img
-              alt="profile-user"
-              src={user?.profileImage ? `/uploads/${user.profileImage}` : defaultProfilePic}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </Box>
+        <Box
+          width="100px"
+          height="100px"
+          borderRadius="50%"
+          overflow="hidden"
+          border={`2px solid ${colors.greenAccent[500]}`}
+        >
+          <img
+            alt="profile-user"
+            src={user?.profileImage ? `http://localhost:5000/uploads/${user.profileImage}` : defaultProfilePic}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+            onError={(e) => {
+              // Fallback to default image if the profile image fails to load
+              e.target.src = defaultProfilePic;
+            }}
+          />
+        </Box>
         <IconButton
           component="label"
           sx={{
@@ -118,13 +144,18 @@ const EditProfile = () => {
           }}
         >
           <PhotoCameraIcon />
-          <input type="file" hidden accept="image/*" onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) {
-              // Update Formik's form data with the new file
-              setUser((prevUser) => ({ ...prevUser, profileImage: file.name }));
-            }
-          }} />
+          <input
+            type="file"
+            hidden
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                // Update Formik's form data with the new file
+                setUser((prevUser) => ({ ...prevUser, profileImage: file }));
+              }
+            }}
+          />
         </IconButton>
       </Box>
 

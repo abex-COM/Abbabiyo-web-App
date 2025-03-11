@@ -3,6 +3,9 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const upload = require('../middleware/upload'); // Import multer middleware
 const User = require('../models/User');
+const bcrypt = require('bcryptjs'); // Import bcrypt for password hashing
+const fs = require('fs'); // Import fs to handle file system operations
+const path = require('path'); // Import path to handle file paths
 
 // Existing routes...
 router.post('/register', authController.register);
@@ -21,13 +24,24 @@ router.put('/update-profile/:id', upload.single('profileImage'), async (req, res
          return res.status(404).json({ message: 'User not found' });
       }
 
+      // If a new profile image is uploaded, delete the old one (if it exists)
+      if (profileImage && user.profileImage && user.profileImage !== 'default.png') {
+         const oldImagePath = path.join(__dirname, '..', 'uploads', user.profileImage);
+         if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath); // Delete the old image file
+         }
+      }
+
+      // Update user fields
       user.fullName = fullName || user.fullName;
       user.username = username || user.username;
       user.email = email || user.email;
-      user.profileImage = profileImage || user.profileImage;
+      user.profileImage = profileImage || user.profileImage; // Update the profile image field
 
       if (password) {
-         user.password = password;
+         // Hash the new password before saving it
+         const salt = await bcrypt.genSalt(10);
+         user.password = await bcrypt.hash(password, salt);
       }
 
       await user.save();

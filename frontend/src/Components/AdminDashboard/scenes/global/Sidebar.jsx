@@ -171,18 +171,37 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             )}
           </MenuItem>
 
-          {/* USER PROFILE SECTION */}
-          {!isCollapsed && (
-            <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={user?.profileImage ? `/uploads/${user.profileImage}` : defaultProfilePic}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
+         {/* USER PROFILE SECTION */}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center" // Center horizontally
+            justifyContent="center" // Center vertically
+            height="100%" // Take full height of the sidebar
+            mb={isCollapsed ? "0px" : "25px"} // Adjust margin when collapsed
+          >
+            <Box
+              width="100px"
+              height="100px"
+              borderRadius="50%"
+              overflow="hidden"
+              border={`2px solid ${colors.greenAccent[500]}`}
+            >
+              <img
+                alt="profile-user"
+                src={user?.profileImage ? `http://localhost:5000/uploads/${user.profileImage}` : defaultProfilePic}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+                onError={(e) => {
+                  // Fallback to default image if the profile image fails to load
+                  e.target.src = defaultProfilePic;
+                }}
+              />
+            </Box>
+            {!isCollapsed && (
               <Box textAlign="center">
                 <Typography
                   variant="h2"
@@ -196,8 +215,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   System Admin
                 </Typography>
               </Box>
-            </Box>
-          )}
+            )}
+          </Box>
 
           {/* MENU ITEMS */}
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
