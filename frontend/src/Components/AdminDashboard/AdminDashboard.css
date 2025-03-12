@@ -108,3 +108,30 @@ button {
     font-size: 14px !important;
   }
 }
+
+/* Custom CSS for DataGrid */
+.name-column--cell {
+  color: #4cceac; /* Green accent color */
+}
+
+/* Custom CSS for the DataGrid header */
+.MuiDataGrid-columnHeaders {
+  background-color: #3e4396; /* Blue accent color */
+  border-bottom: none;
+}
+
+/* Custom CSS for the DataGrid rows */
+.MuiDataGrid-virtualScroller {
+  background-color: #1f2a40; /* Primary dark color */
+}
+
+/* Custom CSS for the DataGrid footer */
+.MuiDataGrid-footerContainer {
+  border-top: none;
+  background-color: #3e4396; /* Blue accent color */
+}
+
+/* Custom CSS for checkboxes */
+.MuiCheckbox-root {
+  color: #4cceac !important; /* Green accent color */
+}

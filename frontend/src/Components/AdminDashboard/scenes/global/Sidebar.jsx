@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
+import { ProSidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
@@ -25,8 +25,8 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
   // Map the title to the correct view name
   const getViewName = (title) => {
     switch (title) {
-      case "Manage Team":
-        return "Team";
+      case "Dashboard":
+        return "Dashboard";
       case "Contacts Information":
         return "Contacts";
       case "Invoices Balances":
@@ -43,10 +43,14 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
         return "Line";
       case "Geography Chart":
         return "Geography";
-      case "Manage Admins": // Add this case
+      case "Admins": // Redirect to ManageAdmins
         return "ManageAdmins";
+      case "Team": // Redirect to Team
+        return "Team";
+      case "Create Admin": // Redirect to AddAdmin
+        return "AddAdmin";
       default:
-        return title; // For "Dashboard" and "Calendar"
+        return title;
     }
   };
 
@@ -77,6 +81,10 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
     email: "",
     profileImage: "default.png", // Default profile image
   });
+
+  // State to manage dropdown open/close
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isManageOpen, setIsManageOpen] = useState(false);
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -173,7 +181,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             )}
           </MenuItem>
 
-         {/* USER PROFILE SECTION */}
+          {/* USER PROFILE SECTION */}
           <Box
             display="flex"
             flexDirection="column"
@@ -240,13 +248,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               Data
             </Typography>
             <Item
-              title="Manage Team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-            />
-            <Item
               title="Contacts Information"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
@@ -269,13 +270,30 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               Pages
             </Typography>
-            <Item
-              title="Create User"
+
+            {/* Create Dropdown */}
+            <SubMenu
+              title="Create"
               icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-            />
+              open={isCreateOpen}
+              onOpenChange={() => setIsCreateOpen(!isCreateOpen)}
+            >
+              <Item
+                title="Create Admin"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                setCurrentView={setCurrentView}
+              />
+              <Item
+                title="Create User"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                setCurrentView={setCurrentView}
+              />
+            </SubMenu>
+
             <Item
               title="Calendar"
               icon={<CalendarTodayOutlinedIcon />}
@@ -291,16 +309,30 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setCurrentView={setCurrentView}
             />
 
-            {/* Add "Manage Admins" for Super Admin */}
-            {user?.role === 'superadmin' && (
+            {/* Manage Dropdown */}
+            <SubMenu
+              title="Manage"
+              icon={<PeopleOutlinedIcon />}
+              open={isManageOpen}
+              onOpenChange={() => setIsManageOpen(!isManageOpen)}
+            >
+              {/* Admins */}
               <Item
-                title="Manage Admins"
+                title="Admins"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
                 setSelected={setSelected}
                 setCurrentView={setCurrentView}
               />
-            )}
+              {/* Team */}
+              <Item
+                title="Team"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                setCurrentView={setCurrentView}
+              />
+            </SubMenu>
 
             {/* CHARTS SECTION */}
             <Typography

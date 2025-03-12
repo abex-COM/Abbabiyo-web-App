@@ -17,6 +17,7 @@ import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./scenes/editProfile";
 import ManageAdmins from "./scenes/manageAdmins"; // Import the ManageAdmins component
+import AddAdmin from "./scenes/addAdmin"; // Import the AddAdmin component
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -61,8 +62,10 @@ const AdminDashboard = () => {
         return <Geography />;
       case "EditProfile":
         return <EditProfile />;
-      case "ManageAdmins": // Add this case
+      case "ManageAdmins": // Handle ManageAdmins view
         return <ManageAdmins />;
+      case "AddAdmin": // Handle AddAdmin view
+        return <AddAdmin />;
       default:
         return <Dashboard />;
     }
