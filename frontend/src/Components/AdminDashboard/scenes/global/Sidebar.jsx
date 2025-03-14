@@ -18,7 +18,7 @@ import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import axios from "axios";
 import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
 
-const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
+const Item = ({ title, icon, selected, setSelected, setCurrentView, closeDropdowns }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -63,6 +63,7 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView }) => {
       onClick={() => {
         setSelected(title);
         setCurrentView(getViewName(title)); // Update the current view
+        closeDropdowns(); // Close all dropdowns when an item is clicked
       }}
       icon={icon}
     >
@@ -80,11 +81,30 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
     username: "",
     email: "",
     profileImage: "default.png", // Default profile image
+    role: "", // Add role to the user state
   });
 
   // State to manage dropdown open/close
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
+
+  // Function to close all dropdowns
+  const closeDropdowns = () => {
+    setIsCreateOpen(false);
+    setIsManageOpen(false);
+  };
+
+  // Function to handle Create dropdown open/close
+  const handleCreateOpen = () => {
+    setIsCreateOpen(!isCreateOpen);
+    setIsManageOpen(false); // Close Manage dropdown when Create is opened
+  };
+
+  // Function to handle Manage dropdown open/close
+  const handleManageOpen = () => {
+    setIsManageOpen(!isManageOpen);
+    setIsCreateOpen(false); // Close Create dropdown when Manage is opened
+  };
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -222,7 +242,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   {user?.fullName || "Fira Teferi"}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  System Admin
+                  {user?.role === "superadmin" ? "Super Admin" : "Admin"}
                 </Typography>
               </Box>
             )}
@@ -237,6 +257,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
 
             {/* DATA SECTION */}
@@ -247,12 +268,71 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               Data
             </Typography>
+            {/* Create Dropdown */}
+            <SubMenu
+              title="Create"
+              icon={<PersonOutlinedIcon />}
+              open={isCreateOpen}
+              onOpenChange={handleCreateOpen} // Use handleCreateOpen to manage dropdown state
+            >
+              {/* Show Create Admin only for superadmin */}
+              {user?.role === "superadmin" && (
+                <Item
+                  title="Create Admin"
+                  icon={<PersonOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                  setCurrentView={setCurrentView}
+                  closeDropdowns={closeDropdowns} // Pass closeDropdowns function
+                />
+              )}
+              {/* Show Create User for both superadmin and admin */}
+              <Item
+                title="Create User"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                setCurrentView={setCurrentView}
+                closeDropdowns={closeDropdowns} // Pass closeDropdowns function
+              />
+            </SubMenu>
+
+            {/* Manage Dropdown */}
+            <SubMenu
+              title="Manage"
+              icon={<PeopleOutlinedIcon />}
+              open={isManageOpen}
+              onOpenChange={handleManageOpen} // Use handleManageOpen to manage dropdown state
+            >
+              {/* Show Manage Admins only for superadmin */}
+              {user?.role === "superadmin" && (
+                <Item
+                  title="Admins"
+                  icon={<PeopleOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                  setCurrentView={setCurrentView}
+                  closeDropdowns={closeDropdowns} // Pass closeDropdowns function
+                />
+              )}
+              {/* Show Manage Team for both superadmin and admin */}
+              <Item
+                title="Team"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                setCurrentView={setCurrentView}
+                closeDropdowns={closeDropdowns} // Pass closeDropdowns function
+              />
+            </SubMenu>
+            
             <Item
               title="Contacts Information"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
               title="Invoices Balances"
@@ -260,6 +340,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
 
             {/* PAGES SECTION */}
@@ -270,36 +351,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               Pages
             </Typography>
-
-            {/* Create Dropdown */}
-            <SubMenu
-              title="Create"
-              icon={<PersonOutlinedIcon />}
-              open={isCreateOpen}
-              onOpenChange={() => setIsCreateOpen(!isCreateOpen)}
-            >
-              <Item
-                title="Create Admin"
-                icon={<PersonOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                setCurrentView={setCurrentView}
-              />
-              <Item
-                title="Create User"
-                icon={<PersonOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                setCurrentView={setCurrentView}
-              />
-            </SubMenu>
-
             <Item
               title="Calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
               title="FAQ Page"
@@ -307,33 +365,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
-
-            {/* Manage Dropdown */}
-            <SubMenu
-              title="Manage"
-              icon={<PeopleOutlinedIcon />}
-              open={isManageOpen}
-              onOpenChange={() => setIsManageOpen(!isManageOpen)}
-            >
-              {/* Admins */}
-              <Item
-                title="Admins"
-                icon={<PeopleOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                setCurrentView={setCurrentView}
-              />
-              {/* Team */}
-              <Item
-                title="Team"
-                icon={<PeopleOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                setCurrentView={setCurrentView}
-              />
-            </SubMenu>
-
             {/* CHARTS SECTION */}
             <Typography
               variant="h6"
@@ -348,6 +381,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
               title="Pie Chart"
@@ -355,6 +389,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
               title="Line Chart"
@@ -362,6 +397,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
               title="Geography Chart"
@@ -369,6 +405,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
+              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
           </Box>
         </Menu>

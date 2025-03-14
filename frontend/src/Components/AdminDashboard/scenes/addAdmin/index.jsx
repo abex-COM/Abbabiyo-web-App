@@ -12,31 +12,37 @@ const AddAdmin = () => {
 
   const handleFormSubmit = async (values, { resetForm }) => {
     try {
-      // Include the role as "admin" explicitly
-      const adminData = { ...values, role: "admin" };
-
-      // Send a POST request to the backend to create a new admin
       const token = localStorage.getItem("token");
+
+      // Send a POST request to create a new admin
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        adminData,
+        "http://localhost:5000/api/admin/admins",
+        values,
         {
-          headers: { Authorization: `Bearer ${token}` }, // Include token for superadmin validation
+          headers: { Authorization: `Bearer ${token}` }, // Include the token in the headers
         }
       );
 
-      console.log("Admin created:", response.data);
-      toast.success("Admin created successfully!");
-      resetForm();
+      // Use the success message from the backend response
+      toast.success(response.data.message || "Admin created successfully!");
+      resetForm(); // Reset the form after successful submission
     } catch (error) {
       console.error("Error creating admin:", error.response?.data || error.message);
-      toast.error("Failed to create admin. Only Super Admins can perform this action.");
-      resetForm();
+
+      // Use the error message from the backend response
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message); // Display backend error message
+      } else {
+        toast.error("An unexpected error occurred. Please try again."); // Fallback error message
+      }
+
+      resetForm(); // Reset the form even if there's an error
     }
   };
 
   return (
     <Box m="20px">
+      {/* Toast Container for notifications */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -48,8 +54,11 @@ const AddAdmin = () => {
         draggable
         pauseOnHover
       />
+
+      {/* Header */}
       <Header title="CREATE ADMIN" subtitle="Create a New Admin Profile" />
 
+      {/* Formik Form */}
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -72,7 +81,7 @@ const AddAdmin = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-              {/* Full Name */}
+              {/* Full Name Field */}
               <TextField
                 fullWidth
                 variant="filled"
@@ -87,7 +96,7 @@ const AddAdmin = () => {
                 sx={{ gridColumn: "span 4" }}
               />
 
-              {/* Username */}
+              {/* Username Field */}
               <TextField
                 fullWidth
                 variant="filled"
@@ -102,7 +111,7 @@ const AddAdmin = () => {
                 sx={{ gridColumn: "span 4" }}
               />
 
-              {/* Email */}
+              {/* Email Field */}
               <TextField
                 fullWidth
                 variant="filled"
@@ -117,7 +126,7 @@ const AddAdmin = () => {
                 sx={{ gridColumn: "span 4" }}
               />
 
-              {/* Password */}
+              {/* Password Field */}
               <TextField
                 fullWidth
                 variant="filled"
@@ -132,8 +141,20 @@ const AddAdmin = () => {
                 sx={{ gridColumn: "span 4" }}
               />
             </Box>
+
+            {/* Submit Button */}
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button
+                type="submit"
+                color="secondary"
+                variant="contained"
+                sx={{
+                  "&:hover": {
+                    transform: "none",
+                    backgroundColor: "secondary.main",
+                  },
+                }}
+              >
                 Create New Admin
               </Button>
             </Box>
@@ -144,18 +165,18 @@ const AddAdmin = () => {
   );
 };
 
-// Validation Schema (adjusted for admin)
+// Validation Schema
 const checkoutSchema = yup.object().shape({
   fullName: yup
     .string()
     .required("Full Name is required")
-    .matches(/^[A-Za-z\s]+$/, "Full Name must contain only alphabetic characters"),
+    .matches(/^[A-Za-z\s]+$/, "Full Name must contain only alphabetic characters and spaces"),
   username: yup.string().required("Username is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
 });
 
-// Initial Values (no farm-specific fields)
+// Initial Values
 const initialValues = {
   fullName: "",
   username: "",

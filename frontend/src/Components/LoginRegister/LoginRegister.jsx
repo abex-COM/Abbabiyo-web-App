@@ -3,7 +3,7 @@ import { FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
 import { FaRegMoon } from 'react-icons/fa6';
 import { MdOutlineLanguage } from "react-icons/md";
 import { TiWeatherSunny } from "react-icons/ti";
-import { register, login } from './api';
+import { register, login } from './api'; // Keep the login import
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -116,9 +116,7 @@ const LanguageDropdown = ({ onLanguageChange, isOpen, onMouseEnter, onMouseLeave
 // Main LoginRegister Component
 const LoginRegister = () => {
   const [formData, setFormData] = useState({
-    fullname: '',
     username: '',
-    email: '',
     password: '',
   });
   const [action, setAction] = useState('');
@@ -148,10 +146,25 @@ const LoginRegister = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await login(formData);
-      console.log('Login successful:', res.data.token);
-      localStorage.setItem('token', res.data.token);
+      // Use the login function from the api file
+      const res = await login({
+        username: formData.username,
+        password: formData.password,
+      });
+
+      // Extract the token from the response
+      const { token } = res.data;
+
+      // Store the token in localStorage
+      localStorage.setItem('token', token);
+
+      // Log the token for debugging
+      console.log('Login successful. Token:', token);
+
+      // Navigate to the admin page
       navigate('/admin');
+
+      // Display success toast
       toast.success('Login successful!', {
         position: "top-right",
         autoClose: 3000,
@@ -160,9 +173,12 @@ const LoginRegister = () => {
         pauseOnHover: true,
         draggable: true,
       });
-    } catch (err) {
-      console.error('Login failed:', err.response?.data || err.message);
-      toast.error('Login failed. Please check your credentials.', {
+    } catch (error) {
+      // Log the error for debugging
+      console.error('Login failed:', error.response?.data || error.message);
+
+      // Display error toast
+      toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.', {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -171,10 +187,9 @@ const LoginRegister = () => {
         draggable: true,
       });
     } finally {
+      // Reset the form data
       setFormData({
-        fullName: '',
         username: '',
-        email: '',
         password: '',
       });
     }
@@ -185,7 +200,7 @@ const LoginRegister = () => {
     try {
       const res = await register(formData);
       console.log('Registration response:', res);
-  
+
       // Ensure the response contains a token
       if (res.data && res.data.token) {
         localStorage.setItem('token', res.data.token); // Save token to localStorage
@@ -206,13 +221,12 @@ const LoginRegister = () => {
         });
 
         window.location.reload();
-        
       } else {
         throw new Error('Token not found in response');
       }
     } catch (err) {
       console.error('Registration failed:', err.response?.data || err.message);
-  
+
       // Display error message to the user
       toast.error(err.response?.data?.message || 'Registration failed. Please try again.', {
         position: "top-right",
@@ -222,7 +236,7 @@ const LoginRegister = () => {
         pauseOnHover: true,
         draggable: true,
       });
-  
+
       // Reset form data in case of error
       setFormData({
         fullName: '',
@@ -233,7 +247,6 @@ const LoginRegister = () => {
     }
   };
 
-  
   const registerLink = () => setAction(' active');
   const loginLink = () => setAction('');
 

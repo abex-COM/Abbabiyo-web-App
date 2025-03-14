@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const { connectDB } = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const farmerRoutes = require('./routes/farmerRoutes');
-const adminRoutes = require('./routes/adminRoutes'); // Add admin routes
+const adminRoutes = require('./routes/adminRoutes'); // Import admin routes
 dotenv.config();
 
 const app = express();
@@ -22,7 +22,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/farmers', farmerRoutes);
-app.use('/api/admin', adminRoutes); // Add admin routes
+app.use('/api/admin', adminRoutes); // Use admin routes
 
 // Start the server
 app.listen(PORT, () => {
