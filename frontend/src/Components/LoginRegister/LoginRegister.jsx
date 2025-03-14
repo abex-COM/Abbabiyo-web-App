@@ -157,12 +157,10 @@ const LoginRegister = () => {
 
       // Store the token in localStorage
       localStorage.setItem('token', token);
-
+       // Navigate to the admin page
+       navigate('/admin');
       // Log the token for debugging
       console.log('Login successful. Token:', token);
-
-      // Navigate to the admin page
-      navigate('/admin');
 
       // Display success toast
       toast.success('Login successful!', {

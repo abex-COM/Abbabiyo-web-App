@@ -68,7 +68,12 @@ const EditAdminModal = ({ open, onClose, admin, onSave }) => {
             margin="normal"
           />
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-            <Button onClick={onClose} sx={{ mr: 2 }} variant="contained">
+            <Button
+              onClick={onClose}
+              sx={{ mr: 2 }}
+              variant="contained"
+              color="primary"
+            >
               Cancel
             </Button>
             <Button type="submit" variant="contained" color="primary">
@@ -81,26 +86,44 @@ const EditAdminModal = ({ open, onClose, admin, onSave }) => {
   );
 };
 
-// Main ManageAdmins Component
+// Main Component
 const ManageAdmins = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode); // Using 'colors' for styling
+  const colors = tokens(theme.palette.mode);
   const [admins, setAdmins] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
 
-  // Fetch admins from the backend
+  // Fetch admin data from the backend
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          toast.error("You are not authorized. Please log in.");
+          return;
+        }
+
         const response = await axios.get("http://localhost:5000/api/admin/admins", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setAdmins(response.data);
+
+        // Normalize the data: Ensure every admin has a `role` field
+        const normalizedAdmins = response.data.map((admin) => ({
+          ...admin,
+          role: admin.role || "admin", // Default to "admin" if `role` is missing
+        }));
+
+        console.log("Normalized admins data:", normalizedAdmins); // Log the normalized data
+        setAdmins(normalizedAdmins); // Update state with normalized admin data
       } catch (error) {
         console.error("Error fetching admins:", error);
-        toast.error("Failed to fetch admins.");
+        if (error.response) {
+          console.error("Error details:", error.response.data); // Log the full error response
+          toast.error("Failed to fetch admins. Please check your permissions.");
+        } else {
+          toast.error("Network error. Please try again.");
+        }
       }
     };
 
@@ -114,11 +137,14 @@ const ManageAdmins = () => {
       await axios.delete(`http://localhost:5000/api/admin/admins/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAdmins(admins.filter((admin) => admin._id !== id));
+      setAdmins(admins.filter((admin) => admin._id !== id)); // Remove the deleted admin from the list
       toast.success("Admin deleted successfully!");
     } catch (error) {
       console.error("Error deleting admin:", error);
-      toast.error("Failed to delete admin.");
+      if (error.response) {
+        console.error("Error details:", error.response.data); // Log the full error response
+      }
+      toast.error("Failed to delete admin. Please try again.");
     }
   };
 
@@ -150,36 +176,55 @@ const ManageAdmins = () => {
       toast.success("Admin updated successfully!");
     } catch (error) {
       console.error("Error updating admin:", error);
-      toast.error("Failed to update admin.");
+      if (error.response) {
+        console.error("Error details:", error.response.data); // Log the full error response
+      }
+      toast.error("Failed to update admin. Please try again.");
     }
   };
 
   // Define columns for the DataGrid
   const columns = [
-    { field: "_id", headerName: "ID", flex: 1 },
+    { field: "_id", headerName: "ID", flex: 1 }, // Use _id as the unique identifier
     {
       field: "fullName",
       headerName: "Full Name",
       flex: 1,
-      cellClassName: "name-column--cell", // Apply custom class for styling
+      cellClassName: "name-column--cell",
     },
-    { field: "username", headerName: "Username", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
+    {
+      field: "username",
+      headerName: "Username",
+      flex: 1,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+    },
+    {
+      field: "role",
+      headerName: "Role",
+      flex: 1,
+    },
     {
       field: "actions",
       headerName: "Actions",
       flex: 1,
       renderCell: (params) => (
         <Box>
+          {/* Edit Button */}
           <IconButton
             onClick={() => handleEdit(params.row)}
-            sx={{ color: colors.greenAccent[500] }} // Use colors for styling
+            sx={{ color: colors.greenAccent[500] }}
           >
             <EditIcon />
           </IconButton>
+
+          {/* Delete Button */}
           <IconButton
             onClick={() => handleDelete(params.row._id)}
-            sx={{ color: colors.redAccent[500] }} // Use colors for styling
+            sx={{ color: colors.redAccent[500] }}
           >
             <DeleteIcon />
           </IconButton>
@@ -202,11 +247,7 @@ const ManageAdmins = () => {
         draggable
         pauseOnHover
       />
-
-      {/* Title */}
-      <Header title="MANAGE ADMINS" subtitle="Managing the Admins" />
-
-      {/* DataGrid for Admins */}
+      <Header title="ADMINS" subtitle="Managing the Admins" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -218,21 +259,21 @@ const ManageAdmins = () => {
             borderBottom: "none",
           },
           "& .name-column--cell": {
-            color: colors.greenAccent[300], // Use colors for styling
+            color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700], // Use colors for styling
+            backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400], // Use colors for styling
+            backgroundColor: colors.primary[400],
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700], // Use colors for styling
+            backgroundColor: colors.blueAccent[700],
           },
           "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`, // Use colors for styling
+            color: `${colors.greenAccent[200]} !important`,
           },
         }}
       >
@@ -240,19 +281,17 @@ const ManageAdmins = () => {
           checkboxSelection
           rows={admins}
           columns={columns}
-          getRowId={(row) => row._id}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
+          getRowId={(row) => row._id} // Use _id as the unique identifier
         />
       </Box>
 
-      {/* Edit Admin Modal */}
+      {/* Render EditAdminModal only if selectedAdmin is not null */}
       {selectedAdmin && (
         <EditAdminModal
           open={editModalOpen}
           onClose={() => {
             setEditModalOpen(false);
-            setSelectedAdmin(null);
+            setSelectedAdmin(null); // Reset selectedAdmin
           }}
           admin={selectedAdmin}
           onSave={handleSave}
