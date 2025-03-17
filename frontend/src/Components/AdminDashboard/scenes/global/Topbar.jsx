@@ -5,10 +5,9 @@ import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import { MdOutlineLanguage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 const Topbar = ({ setCurrentView }) => {
@@ -56,10 +55,7 @@ const Topbar = ({ setCurrentView }) => {
           {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
         </IconButton>
         <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
+          <MdOutlineLanguage />
         </IconButton>
         <IconButton onMouseEnter={handleProfileHover} onMouseLeave={handleMenuClose}>
           <PersonOutlinedIcon />

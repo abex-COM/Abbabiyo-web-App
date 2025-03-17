@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
+import { FaUser, FaLock } from 'react-icons/fa';
 import { FaRegMoon } from 'react-icons/fa6';
 import { MdOutlineLanguage } from "react-icons/md";
 import { TiWeatherSunny } from "react-icons/ti";
-import { register, login } from './api'; // Keep the login import
+import { login } from './api'; 
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,55 +14,31 @@ import { tokens } from './theme';
 const translations = {
   en: {
     login: "Login",
-    register: "Register",
     username: "Username",
     password: "Password",
-    fullName: "Full Name",
-    email: "Email",
     rememberMe: "Remember me",
     forgotPassword: "Forgot Password",
-    agreeTerms: "I agree to the terms & conditions",
-    noAccount: "Don't have an account?",
-    haveAccount: "Already have an account?",
   },
   am: {
     login: "ግባ",
-    register: "ይመዝገቡ",
     username: "የተጠቃሚ ስም",
     password: "የይለፍ ቃል",
-    fullName: "ሙሉ ስም",
-    email: "ኢሜይል",
     rememberMe: "አስታውሰኝ",
     forgotPassword: "የይለፍ ቃል ረሳኽው?",
-    agreeTerms: "ከውሎች ጋር ተስማምቻለሁ",
-    noAccount: "መለያ የሎትህ?",
-    haveAccount: "ቀድሞ መለያ አለህ?",
   },
   om: {
     login: "Seeni",
-    register: "Galmeessi",
     username: "Maqaa Fayyadamaa",
     password: "Jecha Darbii",
-    fullName: "Maqaa Guutuu",
-    email: "Email",
     rememberMe: "Na Yaadadhu",
     forgotPassword: "Jecha Darbii Dagadhe?",
-    agreeTerms: "Haala fi Seera Waliin Walii Galadha",
-    noAccount: "Akkaawuntii Hin Qabduu?",
-    haveAccount: "Akkaawuntii Qabduu?",
   },
   ti: {
     login: "እተው",
-    register: "ተመዝገብ",
     username: "ስም ተጠቃሚ",
     password: "መሕለፊ ቃል",
-    fullName: "ምሉእ ስም",
-    email: "ኢመይል",
     rememberMe: "ዘክርኒ",
     forgotPassword: "መሕለፊ ቃል ረሲዕካ?",
-    agreeTerms: "ምስ ስርዓት ተሰማሚዐ",
-    noAccount: "ኣካውንት የብልካን?",
-    haveAccount: "ቀደም ኣካውንት ኣለካ?",
   },
 };
 
@@ -113,13 +89,12 @@ const LanguageDropdown = ({ onLanguageChange, isOpen, onMouseEnter, onMouseLeave
   );
 };
 
-// Main LoginRegister Component
+// Main Login Component
 const LoginRegister = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
   });
-  const [action, setAction] = useState('');
   const [isNightMode, setIsNightMode] = useState(false);
   const [language, setLanguage] = useState('en'); // Default to English
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -144,25 +119,19 @@ const LoginRegister = () => {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
     try {
-      // Use the login function from the api file
       const res = await login({
         username: formData.username,
         password: formData.password,
       });
 
-      // Extract the token from the response
       const { token } = res.data;
-
-      // Store the token in localStorage
       localStorage.setItem('token', token);
-       // Navigate to the admin page
-       navigate('/admin');
-      // Log the token for debugging
-      console.log('Login successful. Token:', token);
 
-      // Display success toast
+      // Navigate to the admin page
+      navigate('/admin', { replace: true }); // Use replace to prevent re-submission on refresh
+
       toast.success('Login successful!', {
         position: "top-right",
         autoClose: 3000,
@@ -172,10 +141,7 @@ const LoginRegister = () => {
         draggable: true,
       });
     } catch (error) {
-      // Log the error for debugging
       console.error('Login failed:', error.response?.data || error.message);
-
-      // Display error toast
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.', {
         position: "top-right",
         autoClose: 3000,
@@ -185,68 +151,12 @@ const LoginRegister = () => {
         draggable: true,
       });
     } finally {
-      // Reset the form data
       setFormData({
         username: '',
         password: '',
       });
     }
   };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await register(formData);
-      console.log('Registration response:', res);
-
-      // Ensure the response contains a token
-      if (res.data && res.data.token) {
-        localStorage.setItem('token', res.data.token); // Save token to localStorage
-        toast.success('Registration successful!', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        // Reset form data
-        setFormData({
-          fullName: '',
-          username: '',
-          email: '',
-          password: '',
-        });
-
-        window.location.reload();
-      } else {
-        throw new Error('Token not found in response');
-      }
-    } catch (err) {
-      console.error('Registration failed:', err.response?.data || err.message);
-
-      // Display error message to the user
-      toast.error(err.response?.data?.message || 'Registration failed. Please try again.', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      // Reset form data in case of error
-      setFormData({
-        fullName: '',
-        username: '',
-        email: '',
-        password: '',
-      });
-    }
-  };
-
-  const registerLink = () => setAction(' active');
-  const loginLink = () => setAction('');
 
   const toggleTheme = () => {
     setIsNightMode(!isNightMode);
@@ -256,7 +166,6 @@ const LoginRegister = () => {
     setLanguage(lang);
     sessionStorage.setItem('preferredLanguage', lang);
     setIsLanguageDropdownOpen(false);
-    console.log('Language changed to:', lang);
   };
 
   const toggleLanguageDropdown = (isOpen) => {
@@ -309,7 +218,7 @@ const LoginRegister = () => {
           />
         </div>
       </div>
-      <div className={`wrapper${action}`} style={{ backgroundColor: colors.primary[400], color: colors.grey[100] }}>
+      <div className="wrapper" style={{ backgroundColor: colors.primary[400], color: colors.grey[100] }}>
         {/* Login Form */}
         <div className="form-box login">
           <form onSubmit={handleLogin}>
@@ -352,91 +261,6 @@ const LoginRegister = () => {
             <button type="submit" style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}>
               {translations[language].login}
             </button>
-            <div className="register-link">
-              <p>
-                {translations[language].noAccount}{' '}
-                <button type="button" className="link-button router" onClick={registerLink} style={{ color: colors.greenAccent[500] }}>
-                  {translations[language].register}
-                </button>
-              </p>
-            </div>
-          </form>
-        </div>
-
-        {/* Register Form */}
-        <div className="form-box register">
-          <form onSubmit={handleRegister}>
-            <h1>{translations[language].register}</h1>
-            <div className="input-box">
-              <input
-                type="text"
-                placeholder={translations[language].fullName}
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-                style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}
-              />
-              <FaUser className="icon" style={{ color: colors.grey[100] }} />
-            </div>
-            <div className="input-box">
-              <input
-                type="text"
-                placeholder={translations[language].username}
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}
-              />
-              <FaUser className="icon" style={{ color: colors.grey[100] }} />
-            </div>
-            <div className="input-box">
-              <input
-                type="email"
-                placeholder={translations[language].email}
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}
-              />
-              <FaEnvelope className="icon" style={{ color: colors.grey[100] }} />
-            </div>
-            <div className="input-box">
-              <input
-                type="password"
-                placeholder={translations[language].password}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}
-              />
-              <FaLock className="icon" style={{ color: colors.grey[100] }} />
-            </div>
-            <div className="remember-forgot">
-              <label htmlFor="">
-                <input type="checkbox" /> {translations[language].agreeTerms}
-              </label>
-            </div>
-            <button type="submit" style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}>
-              {translations[language].register}
-            </button>
-
-            <div className="register-link">
-              <p>
-                {translations[language].haveAccount}{' '}
-                <button
-                  type="button"
-                  className="link-button router"
-                  onClick={loginLink}
-                  style={{ color: colors.greenAccent[500] }}
-                >
-                  {translations[language].login}
-                </button>
-              </p>
-            </div>
           </form>
         </div>
       </div>
