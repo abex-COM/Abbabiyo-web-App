@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Topbar from "./scenes/global/Topbar";
@@ -16,8 +16,9 @@ import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./scenes/editProfile";
-import ManageAdmins from "./scenes/manageAdmins"; // Import the ManageAdmins component
-import AddAdmin from "./scenes/addAdmin"; // Import the AddAdmin component
+import ManageAdmins from "./scenes/manageAdmins";
+import AddAdmin from "./scenes/addAdmin";
+import { LanguageProvider } from "./LanguageContext"; // Import the LanguageProvider
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -62,9 +63,9 @@ const AdminDashboard = () => {
         return <Geography />;
       case "EditProfile":
         return <EditProfile />;
-      case "ManageAdmins": // Handle ManageAdmins view
+      case "ManageAdmins":
         return <ManageAdmins />;
-      case "AddAdmin": // Handle AddAdmin view
+      case "AddAdmin":
         return <AddAdmin />;
       default:
         return <Dashboard />;
@@ -76,28 +77,30 @@ const AdminDashboard = () => {
   }
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="app">
-          <Sidebar
-            isCollapsed={isSidebarCollapsed}
-            setIsCollapsed={setIsSidebarCollapsed}
-            setCurrentView={setCurrentView}
-          />
-          <main
-            className="content"
-            style={{
-              marginLeft: isSidebarCollapsed ? "80px" : "270px",
-              transition: "margin 0.3s ease",
-            }}
-          >
-            <Topbar setCurrentView={setCurrentView} />
-            {renderView()}
-          </main>
-        </div>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <LanguageProvider>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div className="app">
+            <Sidebar
+              isCollapsed={isSidebarCollapsed}
+              setIsCollapsed={setIsSidebarCollapsed}
+              setCurrentView={setCurrentView}
+            />
+            <main
+              className="content"
+              style={{
+                marginLeft: isSidebarCollapsed ? "80px" : "270px",
+                transition: "margin 0.3s ease",
+              }}
+            >
+              <Topbar setCurrentView={setCurrentView} />
+              {renderView()}
+            </main>
+          </div>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </LanguageProvider>
   );
 };
 

@@ -1,4 +1,3 @@
-// Topbar.jsx
 import { Box, IconButton, useTheme, Menu, MenuItem, Typography } from "@mui/material";
 import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
@@ -9,6 +8,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { MdOutlineLanguage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
 
 const Topbar = ({ setCurrentView }) => {
   const theme = useTheme();
@@ -16,28 +16,59 @@ const Topbar = ({ setCurrentView }) => {
   const colorMode = useContext(ColorModeContext);
   const navigate = useNavigate();
 
+  // State for profile dropdown
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const isProfileMenuOpen = Boolean(anchorEl);
 
+  // State for language dropdown
+  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
+  const isLanguageMenuOpen = Boolean(languageAnchorEl);
+
+  // Get language and changeLanguage function from context
+  const { language, changeLanguage } = useLanguage();
+
+  // Profile dropdown handlers
   const handleProfileHover = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
+  const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
 
   const handleEditProfile = () => {
-    setCurrentView("EditProfile"); // Update the current view to "EditProfile"
-    handleMenuClose();
+    setCurrentView("EditProfile");
+    handleProfileMenuClose();
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     sessionStorage.removeItem("preferredLanguage");
-    handleMenuClose();
+    handleProfileMenuClose();
     navigate("/");
   };
+
+  // Language dropdown handlers
+  const handleLanguageHover = (event) => {
+    setLanguageAnchorEl(event.currentTarget);
+  };
+
+  const handleLanguageMenuClose = () => {
+    setLanguageAnchorEl(null);
+  };
+
+  const handleLanguageChange = (lang) => {
+    changeLanguage(lang); // Update the language globally
+    handleLanguageMenuClose();
+  };
+
+  // Languages list
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "am", name: "Amharic" },
+    { code: "om", name: "Afaan Oromo" },
+    { code: "ti", name: "Tigrinya" },
+  ];
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -51,21 +82,64 @@ const Topbar = ({ setCurrentView }) => {
 
       {/* ICONS */}
       <Box display="flex">
+        {/* Theme Toggle Button */}
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
         </IconButton>
-        <IconButton>
+
+        {/* Language Dropdown */}
+        <IconButton
+          onMouseEnter={handleLanguageHover}
+          onMouseLeave={handleLanguageMenuClose}
+        >
           <MdOutlineLanguage />
         </IconButton>
-        <IconButton onMouseEnter={handleProfileHover} onMouseLeave={handleMenuClose}>
+        <Menu
+          anchorEl={languageAnchorEl}
+          open={isLanguageMenuOpen}
+          onClose={handleLanguageMenuClose}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          PaperProps={{
+            style: {
+              backgroundColor: colors.primary[400],
+              borderRadius: "5px",
+              padding: "0",
+              marginTop: "38px",
+            },
+          }}
+          onMouseEnter={handleLanguageHover}
+          onMouseLeave={handleLanguageMenuClose}
+        >
+          {languages.map((lang) => (
+            <MenuItem
+              key={lang.code}
+              onClick={() => handleLanguageChange(lang.code)}
+              sx={{
+                color: colors.greenAccent[600],
+                fontWeight: "800",
+                borderBottom: `1px solid ${colors.grey[100]}`,
+                "&:hover": {
+                  color: "#00e2e5",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              <Typography variant="body1" sx={{ fontSize: "16px", fontWeight: "700" }}>
+                {lang.name}
+              </Typography>
+            </MenuItem>
+          ))}
+        </Menu>
+
+        {/* Profile Dropdown */}
+        <IconButton onMouseEnter={handleProfileHover} onMouseLeave={handleProfileMenuClose}>
           <PersonOutlinedIcon />
         </IconButton>
-
-        {/* Profile Dropdown Menu */}
         <Menu
           anchorEl={anchorEl}
-          open={open}
-          onClose={handleMenuClose}
+          open={isProfileMenuOpen}
+          onClose={handleProfileMenuClose}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           PaperProps={{
@@ -77,7 +151,7 @@ const Topbar = ({ setCurrentView }) => {
             },
           }}
           onMouseEnter={handleProfileHover}
-          onMouseLeave={handleMenuClose}
+          onMouseLeave={handleProfileMenuClose}
         >
           <MenuItem
             onClick={handleEditProfile}
