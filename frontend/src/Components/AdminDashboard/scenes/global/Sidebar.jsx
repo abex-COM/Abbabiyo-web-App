@@ -17,10 +17,88 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import axios from "axios";
 import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
+import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
+
+// Translation dictionary for the sidebar
+const sidebarTranslations = {
+  en: {
+    Dashboard: "Dashboard",
+    ContactsInformation: "Contacts Information",
+    InvoicesBalances: "Invoices Balances",
+    CreateUser: "Create User",
+    FAQPage: "FAQ Page",
+    BarChart: "Bar Chart",
+    PieChart: "Pie Chart",
+    LineChart: "Line Chart",
+    GeographyChart: "Geography Chart",
+    Admins: "Admins",
+    Team: "Team",
+    CreateAdmin: "Create Admin",
+    Data: "Data",
+    Pages: "Pages",
+    Calendar: "Calendar",
+    Charts: "Charts",
+  },
+  am: {
+    Dashboard: "ዳሽቦርድ",
+    ContactsInformation: "የእውቂያ መረጃ",
+    InvoicesBalances: "የክፍያ ሒሳቦች",
+    CreateUser: "ተጠቃሚ ፍጠር",
+    FAQPage: "ተደጋጋሚ ጥያቄዎች",
+    BarChart: "ባር ገበታ",
+    PieChart: "ፓይ ገበታ",
+    LineChart: "መስመር ገበታ",
+    GeographyChart: "ጂኦግራፊ ገበታ",
+    Admins: "አስተዳዳሪዎች",
+    Team: "ቡድን",
+    CreateAdmin: "አስተዳዳሪ ፍጠር",
+    Data: "ዳታ",
+    Pages: "ገጾች",
+    Calendar: "ቀን መቁጠሪያ",
+    Charts: "ገበታዎች",
+  },
+  om: {
+    Dashboard: "Daashboordii",
+    ContactsInformation: "Oduu Walqunnamtii",
+    InvoicesBalances: "Balansii Kaartaa",
+    CreateUser: "Fayyadamaa Uumu",
+    FAQPage: "Gaaffilee Faakii",
+    BarChart: "Baar Chaartii",
+    PieChart: "Pie Chaartii",
+    LineChart: "Layin Chaartii",
+    GeographyChart: "Jiyoogiraafii Chaartii",
+    Admins: "Manaajiin",
+    Team: "Garee",
+    CreateAdmin: "Manaajii Uumu",
+    Data: "Daataa",
+    Pages: "Fuulli",
+    Calendar: "Kalindarii",
+    Charts: "Chaartii",
+  },
+  ti: {
+    Dashboard: "ዳሽቦርድ",
+    ContactsInformation: "ሓበሬታ ተወላዋይ",
+    InvoicesBalances: "ሒሳብ ክፍሊት",
+    CreateUser: "ተጠቃሚ ምፍጣር",
+    FAQPage: "ተደጋጋሚ ሕቶታት",
+    BarChart: "ባር ገበታ",
+    PieChart: "ፓይ ገበታ",
+    LineChart: "መስመር ገበታ",
+    GeographyChart: "ጂኦግራፊ ገበታ",
+    Admins: "ኣስተዳደርቲ",
+    Team: "ቡድን",
+    CreateAdmin: "ኣስተዳደርቲ ምፍጣር",
+    Data: "ዳታ",
+    Pages: "ገጻት",
+    Calendar: "ቀን መቁጠሪያ",
+    Charts: "ገበታታት",
+  },
+};
 
 const Item = ({ title, icon, selected, setSelected, setCurrentView, closeDropdowns }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { language } = useLanguage(); // Get the current language
 
   // Map the title to the correct view name
   const getViewName = (title) => {
@@ -67,7 +145,7 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView, closeDropdow
       }}
       icon={icon}
     >
-      <Typography>{title}</Typography>
+      <Typography>{sidebarTranslations[language][title] || title}</Typography>
     </MenuItem>
   );
 };
@@ -134,6 +212,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
 
     fetchUserData();
   }, []);
+
+  const { language } = useLanguage(); // Get the current language
 
   return (
     <Box
@@ -266,11 +346,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Data
+              {sidebarTranslations[language].Data}
             </Typography>
             {/* Create Dropdown */}
             <SubMenu
-              title="Create"
+              title={sidebarTranslations[language].CreateUser}
               icon={<PersonOutlinedIcon />}
               open={isCreateOpen}
               onOpenChange={handleCreateOpen} // Use handleCreateOpen to manage dropdown state
@@ -299,7 +379,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
 
             {/* Manage Dropdown */}
             <SubMenu
-              title="Manage"
+              title={sidebarTranslations[language].Admins}
               icon={<PeopleOutlinedIcon />}
               open={isManageOpen}
               onOpenChange={handleManageOpen} // Use handleManageOpen to manage dropdown state
@@ -349,7 +429,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Pages
+              {sidebarTranslations[language].Pages}
             </Typography>
             <Item
               title="Calendar"
@@ -373,7 +453,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Charts
+              {sidebarTranslations[language].Charts}
             </Typography>
             <Item
               title="Bar Chart"
