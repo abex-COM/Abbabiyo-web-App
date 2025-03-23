@@ -38,8 +38,9 @@ const sidebarTranslations = {
     Pages: "Pages",
     Calendar: "Calendar",
     Charts: "Charts",
-    SuperAdmin: "Super Admin", // Added
-    Admin: "Admin", // Added
+    SuperAdmin: "Super Admin",
+    Admin: "Admin",
+    Manage: "Manage", 
   },
   am: {
     Dashboard: "ዳሽቦርድ",
@@ -58,8 +59,9 @@ const sidebarTranslations = {
     Pages: "ገጾች",
     Calendar: "ቀን መቁጠሪያ",
     Charts: "ገበታዎች",
-    SuperAdmin: "ሱፐር አስተዳዳሪ", // Added
-    Admin: "አስተዳዳሪ", // Added
+    SuperAdmin: "ሱፐር አስተዳዳሪ",
+    Admin: "አስተዳዳሪ",
+    Manage: "አስተዳደር", 
   },
   om: {
     Dashboard: "Daashboordii",
@@ -78,8 +80,9 @@ const sidebarTranslations = {
     Pages: "Fuulli",
     Calendar: "Kalindarii",
     Charts: "Chaartii",
-    SuperAdmin: "Manaajii Guddaa", // Added
-    Admin: "Manaajii", // Added
+    SuperAdmin: "Manaajii Guddaa",
+    Admin: "Manaajii",
+    Manage: "Bulchiinsa", 
   },
   ti: {
     Dashboard: "ዳሽቦርድ",
@@ -98,8 +101,9 @@ const sidebarTranslations = {
     Pages: "ገጻት",
     Calendar: "ቀን መቁጠሪያ",
     Charts: "ገበታታት",
-    SuperAdmin: "ሱፐር ኣስተዳደርቲ", // Added
-    Admin: "ኣስተዳደርቲ", // Added
+    SuperAdmin: "ሱፐር ኣስተዳደርቲ",
+    Admin: "ኣስተዳደርቲ",
+    Manage: "ምምሕዳር", 
   },
 };
 
@@ -113,27 +117,27 @@ const Item = ({ title, icon, selected, setSelected, setCurrentView, closeDropdow
     switch (title) {
       case "Dashboard":
         return "Dashboard";
-      case "Contacts Information":
+      case "ContactsInformation":
         return "Contacts";
-      case "Invoices Balances":
+      case "InvoicesBalances":
         return "Invoices";
-      case "Create User":
+      case "CreateUser":
         return "Form";
-      case "FAQ Page":
+      case "FAQPage":
         return "FAQ";
-      case "Bar Chart":
+      case "BarChart":
         return "Bar";
-      case "Pie Chart":
+      case "PieChart":
         return "Pie";
-      case "Line Chart":
+      case "LineChart":
         return "Line";
-      case "Geography Chart":
+      case "GeographyChart":
         return "Geography";
       case "Admins": // Redirect to ManageAdmins
         return "ManageAdmins";
       case "Team": // Redirect to Team
         return "Team";
-      case "Create Admin": // Redirect to AddAdmin
+      case "CreateAdmin": // Redirect to AddAdmin
         return "AddAdmin";
       default:
         return title;
@@ -387,7 +391,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
 
             {/* Manage Dropdown */}
             <SubMenu
-              title={sidebarTranslations[language].Admins}
+              title={sidebarTranslations[language].Manage}
               icon={<PeopleOutlinedIcon />}
               open={isManageOpen}
               onOpenChange={handleManageOpen} // Use handleManageOpen to manage dropdown state
