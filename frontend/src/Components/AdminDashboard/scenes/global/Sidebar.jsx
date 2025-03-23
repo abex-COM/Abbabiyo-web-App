@@ -38,6 +38,8 @@ const sidebarTranslations = {
     Pages: "Pages",
     Calendar: "Calendar",
     Charts: "Charts",
+    SuperAdmin: "Super Admin", // Added
+    Admin: "Admin", // Added
   },
   am: {
     Dashboard: "ዳሽቦርድ",
@@ -56,6 +58,8 @@ const sidebarTranslations = {
     Pages: "ገጾች",
     Calendar: "ቀን መቁጠሪያ",
     Charts: "ገበታዎች",
+    SuperAdmin: "ሱፐር አስተዳዳሪ", // Added
+    Admin: "አስተዳዳሪ", // Added
   },
   om: {
     Dashboard: "Daashboordii",
@@ -74,6 +78,8 @@ const sidebarTranslations = {
     Pages: "Fuulli",
     Calendar: "Kalindarii",
     Charts: "Chaartii",
+    SuperAdmin: "Manaajii Guddaa", // Added
+    Admin: "Manaajii", // Added
   },
   ti: {
     Dashboard: "ዳሽቦርድ",
@@ -92,6 +98,8 @@ const sidebarTranslations = {
     Pages: "ገጻት",
     Calendar: "ቀን መቁጠሪያ",
     Charts: "ገበታታት",
+    SuperAdmin: "ሱፐር ኣስተዳደርቲ", // Added
+    Admin: "ኣስተዳደርቲ", // Added
   },
 };
 
@@ -261,7 +269,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  Admin
+                  {sidebarTranslations[language].Admin}
                 </Typography>
                 <IconButton
                   onClick={() => setIsCollapsed(!isCollapsed)}
@@ -322,7 +330,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   {user?.fullName || "Fira Teferi"}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  {user?.role === "superadmin" ? "Super Admin" : "Admin"}
+                  {user?.role === "superadmin" ? sidebarTranslations[language].SuperAdmin : sidebarTranslations[language].Admin}
                 </Typography>
               </Box>
             )}
@@ -358,7 +366,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               {/* Show Create Admin only for superadmin */}
               {user?.role === "superadmin" && (
                 <Item
-                  title="Create Admin"
+                  title="CreateAdmin"
                   icon={<PersonOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
@@ -368,7 +376,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               )}
               {/* Show Create User for both superadmin and admin */}
               <Item
-                title="Create User"
+                title="CreateUser"
                 icon={<PersonOutlinedIcon />}
                 selected={selected}
                 setSelected={setSelected}
@@ -407,7 +415,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             </SubMenu>
             
             <Item
-              title="Contacts Information"
+              title="ContactsInformation"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -415,7 +423,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
-              title="Invoices Balances"
+              title="InvoicesBalances"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -440,7 +448,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
-              title="FAQ Page"
+              title="FAQPage"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -456,7 +464,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               {sidebarTranslations[language].Charts}
             </Typography>
             <Item
-              title="Bar Chart"
+              title="BarChart"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -464,7 +472,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
-              title="Pie Chart"
+              title="PieChart"
               icon={<PieChartOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -472,7 +480,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
-              title="Line Chart"
+              title="LineChart"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -480,7 +488,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
             <Item
-              title="Geography Chart"
+              title="GeographyChart"
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
