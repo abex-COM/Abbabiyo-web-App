@@ -8,9 +8,110 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLanguage } from "../../LanguageContext";
+
+// Translation dictionary
+const adminTranslations = {
+  en: {
+    title: "ADMINS",
+    subtitle: "Managing the Admins",
+    id: "ID",
+    fullName: "Full Name",
+    username: "Username",
+    email: "Email",
+    role: "Role",
+    actions: "Actions",
+    edit: "Edit",
+    delete: "Delete",
+    deleteSuccess: "Admin deleted successfully!",
+    deleteError: "Failed to delete admin. Please try again.",
+    updateSuccess: "Admin updated successfully!",
+    updateError: "Failed to update admin. Please try again.",
+    cancel: "Cancel",
+    save: "Save",
+    fullNameLabel: "Full Name",
+    usernameLabel: "Username",
+    emailLabel: "Email",
+    unauthorized: "You are not authorized. Please log in.",
+    fetchError: "Failed to fetch admins. Please check your permissions.",
+    networkError: "Network error. Please try again."
+  },
+  am: {
+    title: "አስተዳዳሪዎች",
+    subtitle: "አስተዳዳሪዎችን ማስተዳደር",
+    id: "መለያ",
+    fullName: "ሙሉ ስም",
+    username: "የተጠቃሚ ስም",
+    email: "ኢሜይል",
+    role: "የስራ መደብ",
+    actions: "ድርጊቶች",
+    edit: "አርትዕ",
+    delete: "ሰርዝ",
+    deleteSuccess: "አስተዳዳሪ በተሳካ ሁኔታ ተሰርዟል!",
+    deleteError: "አስተዳዳሪን ማስወገድ አልተቻለም። እባክዎ ደግመው ይሞክሩ።",
+    updateSuccess: "አስተዳዳሪ በተሳካ ሁኔታ ተዘምኗል!",
+    updateError: "አስተዳዳሪን ማዘመን አልተቻለም። እባክዎ ደግመው ይሞክሩ።",
+    cancel: "ሰርዝ",
+    save: "አስቀምጥ",
+    fullNameLabel: "ሙሉ �ም",
+    usernameLabel: "የተጠቃሚ ስም",
+    emailLabel: "ኢሜይል",
+    unauthorized: "የማስፈቀድ መብት የለዎትም። እባክዎ ይግቡ።",
+    fetchError: "አስተዳዳሪዎችን ማግኘት አልተቻለም። ፈቃዶችዎን ያረጋግጡ።",
+    networkError: "የኔትወርክ ስህተት። እባክዎ እንደገና ይሞክሩ።"
+  },
+  om: {
+    title: "ADMINISTRAATORAA",
+    subtitle: "Administraatoraa bulchuu",
+    id: "ID",
+    fullName: "Maqaa Guutuu",
+    username: "Maqaa Fayyadamaa",
+    email: "Imeelii",
+    role: "Dhuunfaa",
+    actions: "Hojiiwwan",
+    edit: "Sirreessuu",
+    delete: "Haquu",
+    deleteSuccess: "Administraatoriin muuxannoo ta'een haqame!",
+    deleteError: "Administraatorii haquu hindandeenye. Irra deebi'ii yaali.",
+    updateSuccess: "Administraatorii muuxannoo ta'een sirreeffame!",
+    updateError: "Administraatorii sirreessuu hindandeenye. Irra deebi'ii yaali.",
+    cancel: "Haquu",
+    save: "Qabachuu",
+    fullNameLabel: "Maqaa Guutuu",
+    usernameLabel: "Maqaa Fayyadamaa",
+    emailLabel: "Imeelii",
+    unauthorized: "Hayyoomina hin qabdu. Maaloo seenaa.",
+    fetchError: "Administraatorota argachuu hindandeenye. Hayyoomina keessan mirkaneessaa.",
+    networkError: "Dhiibbaa netwoorkii. Irra deebi'ii yaali."
+  },
+  ti: {
+    title: "ኣስተዳደርቲ",
+    subtitle: "ኣስተዳደርቲ ምሕደራ",
+    id: "መታወቂያ",
+    fullName: "ምሉእ ስም",
+    username: "ስም ተጠቃሚ",
+    email: "ኢመይል",
+    role: "ሓላፍነት",
+    actions: "ተግባራት",
+    edit: "ምሕዳስ",
+    delete: "ምስራይ",
+    deleteSuccess: "ኣስተዳደርቲ ብትኽክል ተሰሪዙ!",
+    deleteError: "ኣስተዳደርቲ ምስራይ ኣይተኻእለን። በጃኹም ደጊምኩም ፈትኑ።",
+    updateSuccess: "ኣስተዳደርቲ ብትኽክል ተሓዲሱ!",
+    updateError: "ኣስተዳደርቲ ምሕዳስ ኣይተኻእለን። በጃኹም ደጊምኩም ፈትኑ።",
+    cancel: "ምስራይ",
+    save: "ምዝገባ",
+    fullNameLabel: "ምሉእ ስም",
+    usernameLabel: "ስም ተጠቃሚ",
+    emailLabel: "ኢመይል",
+    unauthorized: "ስልጣን የብርኩን። በጃኹም ብጽኑ።",
+    fetchError: "ኣስተዳደርቲ ምርካብ ኣይተኻእለን። ፍቓድኩም ኣረጋግጹ።",
+    networkError: "ሽቅብላል ጸገም። በጃኹም ደጊምኩም ፈትኑ።"
+  }
+};
 
 // Edit Admin Modal Component
-const EditAdminModal = ({ open, onClose, admin, onSave }) => {
+const EditAdminModal = ({ open, onClose, admin, onSave, language }) => {
   const [formData, setFormData] = useState({
     fullName: admin?.fullName || "",
     username: admin?.username || "",
@@ -45,7 +146,7 @@ const EditAdminModal = ({ open, onClose, admin, onSave }) => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Full Name"
+            label={adminTranslations[language].fullNameLabel}
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
@@ -53,7 +154,7 @@ const EditAdminModal = ({ open, onClose, admin, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Username"
+            label={adminTranslations[language].usernameLabel}
             name="username"
             value={formData.username}
             onChange={handleChange}
@@ -61,7 +162,7 @@ const EditAdminModal = ({ open, onClose, admin, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Email"
+            label={adminTranslations[language].emailLabel}
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -74,10 +175,10 @@ const EditAdminModal = ({ open, onClose, admin, onSave }) => {
               variant="contained"
               color="primary"
             >
-              Cancel
+              {adminTranslations[language].cancel}
             </Button>
             <Button type="submit" variant="contained" color="primary">
-              Save
+              {adminTranslations[language].save}
             </Button>
           </Box>
         </form>
@@ -93,6 +194,7 @@ const ManageAdmins = () => {
   const [admins, setAdmins] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const { language } = useLanguage();
 
   // Fetch admin data from the backend
   useEffect(() => {
@@ -100,7 +202,7 @@ const ManageAdmins = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          toast.error("You are not authorized. Please log in.");
+          toast.error(adminTranslations[language].unauthorized);
           return;
         }
 
@@ -114,21 +216,21 @@ const ManageAdmins = () => {
           role: admin.role || "admin", // Default to "admin" if `role` is missing
         }));
 
-        console.log("Normalized admins data:", normalizedAdmins); // Log the normalized data
-        setAdmins(normalizedAdmins); // Update state with normalized admin data
+        console.log("Normalized admins data:", normalizedAdmins);
+        setAdmins(normalizedAdmins);
       } catch (error) {
         console.error("Error fetching admins:", error);
         if (error.response) {
-          console.error("Error details:", error.response.data); // Log the full error response
-          toast.error("Failed to fetch admins. Please check your permissions.");
+          console.error("Error details:", error.response.data);
+          toast.error(adminTranslations[language].fetchError);
         } else {
-          toast.error("Network error. Please try again.");
+          toast.error(adminTranslations[language].networkError);
         }
       }
     };
 
     fetchAdmins();
-  }, []);
+  }, [language]);
 
   // Handle delete admin
   const handleDelete = async (id) => {
@@ -137,14 +239,14 @@ const ManageAdmins = () => {
       await axios.delete(`http://localhost:5000/api/admin/admins/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAdmins(admins.filter((admin) => admin._id !== id)); // Remove the deleted admin from the list
-      toast.success("Admin deleted successfully!");
+      setAdmins(admins.filter((admin) => admin._id !== id));
+      toast.success(adminTranslations[language].deleteSuccess);
     } catch (error) {
       console.error("Error deleting admin:", error);
       if (error.response) {
-        console.error("Error details:", error.response.data); // Log the full error response
+        console.error("Error details:", error.response.data);
       }
-      toast.error("Failed to delete admin. Please try again.");
+      toast.error(adminTranslations[language].deleteError);
     }
   };
 
@@ -173,58 +275,58 @@ const ManageAdmins = () => {
         )
       );
 
-      toast.success("Admin updated successfully!");
+      toast.success(adminTranslations[language].updateSuccess);
     } catch (error) {
       console.error("Error updating admin:", error);
       if (error.response) {
-        console.error("Error details:", error.response.data); // Log the full error response
+        console.error("Error details:", error.response.data);
       }
-      toast.error("Failed to update admin. Please try again.");
+      toast.error(adminTranslations[language].updateError);
     }
   };
 
   // Define columns for the DataGrid
   const columns = [
-    { field: "_id", headerName: "ID", flex: 1 }, // Use _id as the unique identifier
+    { field: "_id", headerName: adminTranslations[language].id, flex: 1 },
     {
       field: "fullName",
-      headerName: "Full Name",
+      headerName: adminTranslations[language].fullName,
       flex: 1,
       cellClassName: "name-column--cell",
     },
     {
       field: "username",
-      headerName: "Username",
+      headerName: adminTranslations[language].username,
       flex: 1,
     },
     {
       field: "email",
-      headerName: "Email",
+      headerName: adminTranslations[language].email,
       flex: 1,
     },
     {
       field: "role",
-      headerName: "Role",
+      headerName: adminTranslations[language].role,
       flex: 1,
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: adminTranslations[language].actions,
       flex: 1,
       renderCell: (params) => (
         <Box>
-          {/* Edit Button */}
           <IconButton
             onClick={() => handleEdit(params.row)}
             sx={{ color: colors.greenAccent[500] }}
+            title={adminTranslations[language].edit}
           >
             <EditIcon />
           </IconButton>
 
-          {/* Delete Button */}
           <IconButton
             onClick={() => handleDelete(params.row._id)}
             sx={{ color: colors.redAccent[500] }}
+            title={adminTranslations[language].delete}
           >
             <DeleteIcon />
           </IconButton>
@@ -235,7 +337,6 @@ const ManageAdmins = () => {
 
   return (
     <Box m="20px">
-      {/* Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -247,7 +348,10 @@ const ManageAdmins = () => {
         draggable
         pauseOnHover
       />
-      <Header title="ADMINS" subtitle="Managing the Admins" />
+      <Header 
+        title={adminTranslations[language].title} 
+        subtitle={adminTranslations[language].subtitle} 
+      />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -281,20 +385,20 @@ const ManageAdmins = () => {
           checkboxSelection
           rows={admins}
           columns={columns}
-          getRowId={(row) => row._id} // Use _id as the unique identifier
+          getRowId={(row) => row._id}
         />
       </Box>
 
-      {/* Render EditAdminModal only if selectedAdmin is not null */}
       {selectedAdmin && (
         <EditAdminModal
           open={editModalOpen}
           onClose={() => {
             setEditModalOpen(false);
-            setSelectedAdmin(null); // Reset selectedAdmin
+            setSelectedAdmin(null);
           }}
           admin={selectedAdmin}
           onSave={handleSave}
+          language={language}
         />
       )}
     </Box>

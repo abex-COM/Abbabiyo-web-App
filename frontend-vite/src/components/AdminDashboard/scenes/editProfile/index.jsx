@@ -8,6 +8,83 @@ import { useState, useEffect, useRef } from "react";
 import defaultProfilePic from "../../assets/default.png";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLanguage } from "../../LanguageContext";
+
+// Translation dictionary for the EditProfile
+const editProfileTranslations = {
+  en: {
+    editProfileTitle: "Edit Profile",
+    fullNameLabel: "Full Name",
+    fullNameError: "Full Name must contain only alphabetic characters and spaces",
+    emailLabel: "Email",
+    emailError: "Invalid email",
+    usernameLabel: "Username",
+    usernameError: "Username is required",
+    passwordLabel: "Password",
+    passwordError: "Password must be at least 6 characters",
+    confirmPasswordLabel: "Confirm Password",
+    confirmPasswordError: "Passwords must match",
+    saveChanges: "Save Changes",
+    fetchError: "Failed to fetch user data",
+    loginError: "You must be logged in to update your profile.",
+    updateSuccess: "Profile updated successfully",
+    updateError: "Failed to update profile."
+  },
+  am: {
+    editProfileTitle: "መገለጫ አርትዕ",
+    fullNameLabel: "ሙሉ ስም",
+    fullNameError: "ሙሉ ስም የፊደላት እና ቦታዎች ብቻ ሊይዝ �ለው",
+    emailLabel: "ኢሜይል",
+    emailError: "ልክ ያልሆነ ኢሜይል",
+    usernameLabel: "የተጠቃሚ ስም",
+    usernameError: "የተጠቃሚ ስም ያስፈልጋል",
+    passwordLabel: "የይለፍ ቃል",
+    passwordError: "የይለፍ ቃል ቢያንስ 6 ቁምፊዎች ሊኖሩት ይገባል",
+    confirmPasswordLabel: "የይለፍ ቃል አረጋግጥ",
+    confirmPasswordError: "የይለፍ ቃሎች መስማማት አለባቸው",
+    saveChanges: "ለውጦችን አስቀምጥ",
+    fetchError: "የተጠቃሚ መረጃ ማግኘት አልተቻለም",
+    loginError: "መገለጫዎን ለመሻሻል መግባት አለብዎት",
+    updateSuccess: "መገለጫው በተሳካ ሁኔታ ተዘምኗል",
+    updateError: "መገለጫውን ማዘመን አልተቻለም"
+  },
+  om: {
+    editProfileTitle: "Faayilaa Sirreessuu",
+    fullNameLabel: "Maqaa Guutuu",
+    fullNameError: "Maqaa guutuu qubee fi iddoo qofa qabaachuu qaba",
+    emailLabel: "Imeelii",
+    emailError: "Imeelii dogoggora",
+    usernameLabel: "Maqaa Fayyadamaa",
+    usernameError: "Maqaa fayyadamaa barbaachisa",
+    passwordLabel: "Jecha Darbii",
+    passwordError: "Jecha darbii sadii ol ta'uu qaba",
+    confirmPasswordLabel: "Jecha Darbii Mirkaneessuu",
+    confirmPasswordError: "Jecha darbii wal qixa ta'uu qaba",
+    saveChanges: "Jijjiiramaa Galii",
+    fetchError: "Odeeffannoo fayyadamtoota argachuu hindandeenye",
+    loginError: "Faayilaa sirreessuuf seenuu qabda",
+    updateSuccess: "Faayilaa sirrii ta'een sirreeffame",
+    updateError: "Faayilaa sirreessuu hindandeenye"
+  },
+  ti: {
+    editProfileTitle: "መግለጺ ምሕዳስ",
+    fullNameLabel: "ምሉእ ስም",
+    fullNameError: "ምሉእ ስም ፊደላትን ከፊትን ጥራይ ክህልዎ ኣለዎ",
+    emailLabel: "ኢመይል",
+    emailError: "ዘይቅኑዕ ኢመይል",
+    usernameLabel: "ስም ተጠቃሚ",
+    usernameError: "ስም ተጠቃሚ ኣስፈላጢ እዩ",
+    passwordLabel: "ቃል ምስጢር",
+    passwordError: "ቃል ምስጢር ልዕሊ 6 ፊደላት ክኸውን ኣለዎ",
+    confirmPasswordLabel: "ቃል ምስጢር ኣረጋግጽ",
+    confirmPasswordError: "ቃላት ምስጢር ተመሳሳሊ ክኸውን ኣለዎ",
+    saveChanges: "ለውጥታት ኣስቀምጥ",
+    fetchError: "ሓበሬታ ተጠቃሚ ክረኽብ ኣይተኻእለን",
+    loginError: "መግለጽካ ንምሕዳስ ክትኣቱ ኣለካ",
+    updateSuccess: "መግለጺ ብትኽክል ተሓዲሱ",
+    updateError: "መግለጺ ምሕዳስ ኣይተኻእለን"
+  }
+};
 
 const EditProfile = () => {
   const theme = useTheme();
@@ -15,6 +92,7 @@ const EditProfile = () => {
   const [user, setUser] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+  const { language } = useLanguage(); // Get the current language
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -31,12 +109,12 @@ const EditProfile = () => {
         setUser(response.data.user);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to fetch user data");
+        toast.error(editProfileTranslations[language].fetchError);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [language]);
 
   // Handle image selection
   const handleImageChange = (e) => {
@@ -55,7 +133,7 @@ const EditProfile = () => {
   const handleFormSubmit = async (values, { resetForm }) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.error("You must be logged in to update your profile.");
+      toast.error(editProfileTranslations[language].loginError);
       return;
     }
 
@@ -84,7 +162,7 @@ const EditProfile = () => {
         }
       );
     
-      toast.success(response.data.message);
+      toast.success(editProfileTranslations[language].updateSuccess);
     
       // Clear the preview after successful upload
       if (imagePreview) {
@@ -107,7 +185,7 @@ const EditProfile = () => {
     
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Failed to update profile.");
+      toast.error(err.response?.data?.message || editProfileTranslations[language].updateError);
     }
   };
 
@@ -140,7 +218,7 @@ const EditProfile = () => {
         fontWeight="bold"
         sx={{ mb: "20px" }}
       >
-        Edit Profile
+        {editProfileTranslations[language].editProfileTitle}
       </Typography>
 
       {/* Profile Picture Upload */}
@@ -213,67 +291,67 @@ const EditProfile = () => {
             <Box display="flex" flexDirection="column" gap="20px">
               <TextField
                 fullWidth
-                label="Full Name"
+                label={editProfileTranslations[language].fullNameLabel}
                 name="fullName"
                 value={values.fullName}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 error={!!touched.fullName && !!errors.fullName}
-                helperText={touched.fullName && errors.fullName}
+                helperText={touched.fullName && errors.fullName && editProfileTranslations[language].fullNameError}
                 variant="outlined"
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
               <TextField
                 fullWidth
-                label="Email"
+                label={editProfileTranslations[language].emailLabel}
                 name="email"
                 value={values.email}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
+                helperText={touched.email && errors.email && editProfileTranslations[language].emailError}
                 variant="outlined"
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
               <TextField
                 fullWidth
-                label="Username"
+                label={editProfileTranslations[language].usernameLabel}
                 name="username"
                 value={values.username}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 error={!!touched.username && !!errors.username}
-                helperText={touched.username && errors.username}
+                helperText={touched.username && errors.username && editProfileTranslations[language].usernameError}
                 variant="outlined"
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
               <TextField
                 fullWidth
-                label="Password"
+                label={editProfileTranslations[language].passwordLabel}
                 name="password"
                 type="password"
                 value={values.password}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 error={!!touched.password && !!errors.password}
-                helperText={touched.password && errors.password}
+                helperText={touched.password && errors.password && editProfileTranslations[language].passwordError}
                 variant="outlined"
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
               <TextField
                 fullWidth
-                label="Confirm Password"
+                label={editProfileTranslations[language].confirmPasswordLabel}
                 name="confirmPassword"
                 type="password"
                 value={values.confirmPassword}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 error={!!touched.confirmPassword && !!errors.confirmPassword}
-                helperText={touched.confirmPassword && errors.confirmPassword}
+                helperText={touched.confirmPassword && errors.confirmPassword && editProfileTranslations[language].confirmPasswordError}
                 variant="outlined"
                 sx={{ backgroundColor: colors.primary[400] }}
               />
@@ -291,7 +369,7 @@ const EditProfile = () => {
                   },
                 }}
               >
-                Save Changes
+                {editProfileTranslations[language].saveChanges}
               </Button>
             </Box>
           </form>
@@ -304,14 +382,14 @@ const EditProfile = () => {
 const checkoutSchema = yup.object().shape({
   fullName: yup
     .string()
-    .required("Full Name is required")
-    .matches(/^[A-Za-z\s]+$/, "Full Name must contain only alphabetic characters and spaces"),
-  username: yup.string().required("Username is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().min(6, "Password must be at least 6 characters"),
+    .required("required")
+    .matches(/^[A-Za-z\s]+$/, "invalid"),
+  username: yup.string().required("required"),
+  email: yup.string().email("invalid").required("required"),
+  password: yup.string().min(6, "too short"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match"),
+    .oneOf([yup.ref("password"), null], "mismatch"),
 });
 
 export default EditProfile;

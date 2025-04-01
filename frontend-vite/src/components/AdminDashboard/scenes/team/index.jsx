@@ -6,11 +6,124 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from 'react-toastify'; // Import toast
-import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useLanguage } from "../../LanguageContext";
+
+// Translation dictionary
+const teamTranslations = {
+  en: {
+    title: "FARMERS",
+    subtitle: "Managing the Farmers",
+    id: "ID",
+    fullName: "Full Name",
+    username: "Username",
+    email: "Email",
+    farmName: "Farm Name",
+    location: "Location",
+    crops: "Crops",
+    actions: "Actions",
+    noCrops: "No crops",
+    edit: "Edit",
+    delete: "Delete",
+    deleteSuccess: "Farmer deleted successfully!",
+    deleteError: "Failed to delete farmer. Please try again.",
+    updateSuccess: "Farmer updated successfully!",
+    updateError: "Failed to update farmer. Please try again.",
+    cancel: "Cancel",
+    save: "Save",
+    fullNameLabel: "Full Name",
+    usernameLabel: "Username",
+    emailLabel: "Email",
+    farmNameLabel: "Farm Name",
+    locationLabel: "Location",
+    cropsLabel: "Crops (comma separated)"
+  },
+  am: {
+    title: "ገበሬዎች",
+    subtitle: "ገበሬዎችን ማስተዳደር",
+    id: "መለያ",
+    fullName: "ሙሉ ስም",
+    username: "የተጠቃሚ ስም",
+    email: "ኢሜይል",
+    farmName: "የግብርና ስም",
+    location: "ቦታ",
+    crops: "የተለማመዱ እምቦታዎች",
+    actions: "ድርጊቶች",
+    noCrops: "እምቦታዎች የሉም",
+    edit: "አርትዕ",
+    delete: "ሰርዝ",
+    deleteSuccess: "ገበሬ በተሳካ ሁኔታ ተሰርዟል!",
+    deleteError: "ገበሬን ማስወገድ አልተቻለም። እባክዎ ደግመው ይሞክሩ።",
+    updateSuccess: "ገበሬ በተሳካ ሁኔታ ተዘምኗል!",
+    updateError: "ገበሬን ማዘመን አልተቻለም። እባክዎ ደግመው ይሞክሩ።",
+    cancel: "ሰርዝ",
+    save: "አስቀምጥ",
+    fullNameLabel: "ሙሉ ስም",
+    usernameLabel: "የተጠቃሚ ስም",
+    emailLabel: "ኢሜይል",
+    farmNameLabel: "የግብርና ስም",
+    locationLabel: "ቦታ",
+    cropsLabel: "የተለማመዱ እምቦታዎች (በነጠላ ሰረዝ የተለዩ)"
+  },
+  om: {
+    title: "QEERANSOOTA",
+    subtitle: "Qeeransoota bulchuu",
+    id: "ID",
+    fullName: "Maqaa Guutuu",
+    username: "Maqaa Fayyadamaa",
+    email: "Imeelii",
+    farmName: "Maqaa Qonnaa",
+    location: "Bakka",
+    crops: "Mala Qonnaa",
+    actions: "Hojiiwwan",
+    noCrops: "Mala Qonnaa hin jiru",
+    edit: "Sirreessuu",
+    delete: "Haquu",
+    deleteSuccess: "Qeeransichii muuxannoo ta'een haqame!",
+    deleteError: "Qeeransichii haquu hindandeenye. Irra deebi'ii yaali.",
+    updateSuccess: "Qeeransichii muuxannoo ta'een sirreeffame!",
+    updateError: "Qeeransichii sirreessuu hindandeenye. Irra deebi'ii yaali.",
+    cancel: "Haquu",
+    save: "Qabachuu",
+    fullNameLabel: "Maqaa Guutuu",
+    usernameLabel: "Maqaa Fayyadamaa",
+    emailLabel: "Imeelii",
+    farmNameLabel: "Maqaa Qonnaa",
+    locationLabel: "Bakka",
+    cropsLabel: "Mala Qonnaa (walitti qoodaman)"
+  },
+  ti: {
+    title: "ገበራውያን",
+    subtitle: "ገበራውያን ምሕደራ",
+    id: "መታወቂያ",
+    fullName: "ምሉእ ስም",
+    username: "ስም ተጠቃሚ",
+    email: "ኢመይል",
+    farmName: "ስም ሕርሻ",
+    location: "ቦታ",
+    crops: "ዝራውቲ",
+    actions: "ተግባራት",
+    noCrops: "ዝራውቲ የለን",
+    edit: "ምሕዳስ",
+    delete: "ምስራይ",
+    deleteSuccess: "ገበራዊ ብትኽክል ተሰሪዙ!",
+    deleteError: "ገበራዊ ምስራይ ኣይተኻእለን። በጃኹም ደጊምኩም ፈትኑ።",
+    updateSuccess: "ገበራዊ ብትኽክል ተሓዲሱ!",
+    updateError: "ገበራዊ ምሕዳስ ኣይተኻእለን። በጃኹም ደጊምኩም ፈትኑ።",
+    cancel: "ምስራይ",
+    save: "ምዝገባ",
+    fullNameLabel: "ምሉእ ስም",
+    usernameLabel: "ስም ተጠቃሚ",
+    emailLabel: "ኢመይል",
+    farmNameLabel: "ስም ሕርሻ",
+    locationLabel: "ቦታ",
+    cropsLabel: "ዝራውቲ (ብነጠላ ሰረዝ ዝተፈላለዩ)"
+  }
+};
 
 // Edit Farmer Modal Component
-const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
+const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -49,7 +162,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Full Name"
+            label={teamTranslations[language].fullNameLabel}
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
@@ -57,7 +170,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Username"
+            label={teamTranslations[language].usernameLabel}
             name="username"
             value={formData.username}
             onChange={handleChange}
@@ -65,7 +178,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Email"
+            label={teamTranslations[language].emailLabel}
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -73,7 +186,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Farm Name"
+            label={teamTranslations[language].farmNameLabel}
             name="farmName"
             value={formData.farmName}
             onChange={handleChange}
@@ -81,7 +194,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Location"
+            label={teamTranslations[language].locationLabel}
             name="location"
             value={formData.location}
             onChange={handleChange}
@@ -89,7 +202,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
           />
           <TextField
             fullWidth
-            label="Crops"
+            label={teamTranslations[language].cropsLabel}
             name="crops"
             value={formData.crops?.join(", ")} // Convert array to comma-separated string
             onChange={(e) =>
@@ -102,12 +215,12 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave }) => {
               onClick={onClose}
               sx={{ mr: 2 }}
               variant="contained"
-              color="primary" // Same color as Save button
+              color="primary"
             >
-              Cancel
+              {teamTranslations[language].cancel}
             </Button>
             <Button type="submit" variant="contained" color="primary">
-              Save
+              {teamTranslations[language].save}
             </Button>
           </Box>
         </form>
@@ -123,6 +236,7 @@ const Team = () => {
   const [farmers, setFarmers] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
+  const { language } = useLanguage();
 
   // Fetch farmer data from the backend
   useEffect(() => {
@@ -139,12 +253,12 @@ const Team = () => {
           crops: farmer.crops || [], // Default to an empty array if `crops` is missing
         }));
 
-        console.log("Normalized farmers data:", normalizedFarmers); // Log the normalized data
-        setFarmers(normalizedFarmers); // Update state with normalized farmer data
+        console.log("Normalized farmers data:", normalizedFarmers);
+        setFarmers(normalizedFarmers);
       } catch (error) {
         console.error("Error fetching farmers:", error);
         if (error.response) {
-          console.error("Error details:", error.response.data); // Log the full error response
+          console.error("Error details:", error.response.data);
         }
       }
     };
@@ -159,14 +273,14 @@ const Team = () => {
       await axios.delete(`http://localhost:5000/api/farmers/farmers/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFarmers(farmers.filter((farmer) => farmer._id !== id)); // Remove the deleted farmer from the list
-      toast.success("Farmer deleted successfully!");
+      setFarmers(farmers.filter((farmer) => farmer._id !== id));
+      toast.success(teamTranslations[language].deleteSuccess);
     } catch (error) {
       console.error("Error deleting farmer:", error);
       if (error.response) {
-        console.error("Error details:", error.response.data); // Log the full error response
+        console.error("Error details:", error.response.data);
       }
-      toast.error("Failed to delete farmer. Please try again.");
+      toast.error(teamTranslations[language].deleteError);
     }
   };
 
@@ -195,72 +309,72 @@ const Team = () => {
         )
       );
 
-      toast.success("Farmer updated successfully!");
+      toast.success(teamTranslations[language].updateSuccess);
     } catch (error) {
       console.error("Error updating farmer:", error);
       if (error.response) {
-        console.error("Error details:", error.response.data); // Log the full error response
+        console.error("Error details:", error.response.data);
       }
-      toast.error("Failed to update farmer. Please try again.");
+      toast.error(teamTranslations[language].updateError);
     }
   };
 
   // Define columns for the DataGrid
   const columns = [
-    { field: "_id", headerName: "ID", flex: 1 }, // Use _id as the unique identifier
+    { field: "_id", headerName: teamTranslations[language].id, flex: 1 },
     {
       field: "fullName",
-      headerName: "Full Name",
+      headerName: teamTranslations[language].fullName,
       flex: 1,
       cellClassName: "name-column--cell",
     },
     {
       field: "username",
-      headerName: "Username",
+      headerName: teamTranslations[language].username,
       flex: 1,
     },
     {
       field: "email",
-      headerName: "Email",
+      headerName: teamTranslations[language].email,
       flex: 1,
     },
     {
       field: "farmName",
-      headerName: "Farm Name",
+      headerName: teamTranslations[language].farmName,
       flex: 1,
     },
     {
       field: "location",
-      headerName: "Location",
+      headerName: teamTranslations[language].location,
       flex: 1,
     },
     {
       field: "crops",
-      headerName: "Crops",
+      headerName: teamTranslations[language].crops,
       flex: 1,
       valueGetter: (params) => {
-        const crops = params.row?.crops || []; // Ensure `crops` is always an array
-        return crops.join(", ") || "No crops"; // Join crops or display "No crops"
+        const crops = params.row?.crops || [];
+        return crops.join(", ") || teamTranslations[language].noCrops;
       },
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: teamTranslations[language].actions,
       flex: 1,
       renderCell: (params) => (
         <Box>
-          {/* Edit Button */}
           <IconButton
             onClick={() => handleEdit(params.row)}
             sx={{ color: colors.greenAccent[500] }}
+            title={teamTranslations[language].edit}
           >
             <EditIcon />
           </IconButton>
 
-          {/* Delete Button */}
           <IconButton
             onClick={() => handleDelete(params.row._id)}
             sx={{ color: colors.redAccent[500] }}
+            title={teamTranslations[language].delete}
           >
             <DeleteIcon />
           </IconButton>
@@ -271,19 +385,21 @@ const Team = () => {
 
   return (
     <Box m="20px">
-           {/* Toast Container */}
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
-      <Header title="FARMERS" subtitle="Managing the Farmers" />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <Header 
+        title={teamTranslations[language].title} 
+        subtitle={teamTranslations[language].subtitle} 
+      />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -317,20 +433,20 @@ const Team = () => {
           checkboxSelection
           rows={farmers}
           columns={columns}
-          getRowId={(row) => row._id} // Use _id as the unique identifier
+          getRowId={(row) => row._id}
         />
       </Box>
 
-      {/* Render EditFarmerModal only if selectedFarmer is not null */}
       {selectedFarmer && (
         <EditFarmerModal
           open={editModalOpen}
           onClose={() => {
             setEditModalOpen(false);
-            setSelectedFarmer(null); // Reset selectedFarmer
+            setSelectedFarmer(null);
           }}
           farmer={selectedFarmer}
           onSave={handleSave}
+          language={language}
         />
       )}
     </Box>

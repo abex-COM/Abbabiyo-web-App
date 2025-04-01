@@ -6,9 +6,91 @@ import Header from "../../components/Header";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLanguage } from "../../LanguageContext";
+
+// Translation dictionary
+const addAdminTranslations = {
+  en: {
+    title: "CREATE ADMIN",
+    subtitle: "Create a New Admin Profile",
+    fullName: "Full Name",
+    username: "Username",
+    email: "Email",
+    password: "Password",
+    createButton: "Create New Admin",
+    success: "Admin created successfully!",
+    error: "An unexpected error occurred. Please try again.",
+    validation: {
+      fullNameRequired: "Full Name is required",
+      fullNameInvalid: "Full Name must contain only alphabetic characters and spaces",
+      usernameRequired: "Username is required",
+      emailInvalid: "Invalid email",
+      emailRequired: "Email is required",
+      passwordRequired: "Password is required"
+    }
+  },
+  am: {
+    title: "አዲስ አስተዳዳሪ ይፍጠሩ",
+    subtitle: "አዲስ የአስተዳዳሪ መግለጫ ይፍጠሩ",
+    fullName: "ሙሉ ስም",
+    username: "የተጠቃሚ ስም",
+    email: "ኢሜይል",
+    password: "የይለፍ ቃል",
+    createButton: "አዲስ አስተዳዳሪ ይፍጠሩ",
+    success: "አስተዳዳሪ በተሳካ ሁኔታ ተፈጥሯል!",
+    error: "ያልተጠበቀ ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ።",
+    validation: {
+      fullNameRequired: "ሙሉ ስም ያስፈልጋል",
+      fullNameInvalid: "ሙሉ ስም የሆሄያት ቁምፊዎችና ቦታዎች ብቻ ሊኖሩት ይገባል",
+      usernameRequired: "የተጠቃሚ ስም ያስፈልጋል",
+      emailInvalid: "ልክ ያልሆነ ኢሜይል",
+      emailRequired: "ኢሜይል ያስፈልጋል",
+      passwordRequired: "የይለፍ ቃል ያስፈልጋል"
+    }
+  },
+  om: {
+    title: "ADMINISTRAATORAA UUMUU",
+    subtitle: "Administraatoraa haaraa uumuu",
+    fullName: "Maqaa Guutuu",
+    username: "Maqaa Fayyadamaa",
+    email: "Imeelii",
+    password: "Jecha Iccitii",
+    createButton: "Administraatoraa Haaraa Uumuu",
+    success: "Administraatoraa muuxannoo ta'een uumame!",
+    error: "Dogoggora hin eegamne dhagahame. Irra deebi'ii yaali.",
+    validation: {
+      fullNameRequired: "Maqaa guutuu barbaachisa",
+      fullNameInvalid: "Maqaa guutuun qubee fi iddoo qofa qabaachuu qaba",
+      usernameRequired: "Maqaa fayyadamaa barbaachisa",
+      emailInvalid: "Imeelii sirrii miti",
+      emailRequired: "Imeelii barbaachisa",
+      passwordRequired: "Jecha iccitii barbaachisa"
+    }
+  },
+  ti: {
+    title: "ኣስተዳደርቲ ምፍጣር",
+    subtitle: "ሓድሽ ኣስተዳደርቲ ምፍጣር",
+    fullName: "ምሉእ ስም",
+    username: "ስም ተጠቃሚ",
+    email: "ኢመይል",
+    password: "ቃል ምልጃ",
+    createButton: "ሓድሽ ኣስተዳደርቲ ምፍጣር",
+    success: "ኣስተዳደርቲ ብትኽክል ተፈጢሩ!",
+    error: "ዘይተጸበናይ ጌጋ ተፈጢሩ። በጃኹም ደጊምኩም ፈትኑ።",
+    validation: {
+      fullNameRequired: "ምሉእ ስም የድሊ",
+      fullNameInvalid: "ምሉእ ስም ፊደላትን ስፍሓትን ጥራይ ክህልዎ ኣለዎ",
+      usernameRequired: "ስም ተጠቃሚ የድሊ",
+      emailInvalid: "ዘይቅኑዕ ኢመይል",
+      emailRequired: "ኢመይል የድሊ",
+      passwordRequired: "ቃል ምልጃ የድሊ"
+    }
+  }
+};
 
 const AddAdmin = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const { language } = useLanguage();
 
   const handleFormSubmit = async (values, { resetForm }) => {
     try {
@@ -19,25 +101,46 @@ const AddAdmin = () => {
         "http://localhost:5000/api/admin/admins",
         values,
         {
-          headers: { Authorization: `Bearer ${token}` }, // Include the token in the headers
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       // Use the success message from the backend response
-      toast.success(response.data.message || "Admin created successfully!");
-      resetForm(); // Reset the form after successful submission
+      toast.success(response.data.message || addAdminTranslations[language].success);
+      resetForm();
     } catch (error) {
       console.error("Error creating admin:", error.response?.data || error.message);
 
       // Use the error message from the backend response
       if (error.response?.data?.message) {
-        toast.error(error.response.data.message); // Display backend error message
+        toast.error(error.response.data.message);
       } else {
-        toast.error("An unexpected error occurred. Please try again."); // Fallback error message
+        toast.error(addAdminTranslations[language].error);
       }
 
-      resetForm(); // Reset the form even if there's an error
+      resetForm();
     }
+  };
+
+  // Validation Schema with translated messages
+  const checkoutSchema = yup.object().shape({
+    fullName: yup
+      .string()
+      .required(addAdminTranslations[language].validation.fullNameRequired)
+      .matches(/^[A-Za-z\s]+$/, addAdminTranslations[language].validation.fullNameInvalid),
+    username: yup.string().required(addAdminTranslations[language].validation.usernameRequired),
+    email: yup.string()
+      .email(addAdminTranslations[language].validation.emailInvalid)
+      .required(addAdminTranslations[language].validation.emailRequired),
+    password: yup.string().required(addAdminTranslations[language].validation.passwordRequired),
+  });
+
+  // Initial Values
+  const initialValues = {
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
   };
 
   return (
@@ -56,7 +159,10 @@ const AddAdmin = () => {
       />
 
       {/* Header */}
-      <Header title="CREATE ADMIN" subtitle="Create a New Admin Profile" />
+      <Header 
+        title={addAdminTranslations[language].title} 
+        subtitle={addAdminTranslations[language].subtitle} 
+      />
 
       {/* Formik Form */}
       <Formik
@@ -86,7 +192,7 @@ const AddAdmin = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Full Name"
+                label={addAdminTranslations[language].fullName}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.fullName}
@@ -101,7 +207,7 @@ const AddAdmin = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Username"
+                label={addAdminTranslations[language].username}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -116,7 +222,7 @@ const AddAdmin = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Email"
+                label={addAdminTranslations[language].email}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -131,7 +237,7 @@ const AddAdmin = () => {
                 fullWidth
                 variant="filled"
                 type="password"
-                label="Password"
+                label={addAdminTranslations[language].password}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -155,7 +261,7 @@ const AddAdmin = () => {
                   },
                 }}
               >
-                Create New Admin
+                {addAdminTranslations[language].createButton}
               </Button>
             </Box>
           </form>
@@ -163,25 +269,6 @@ const AddAdmin = () => {
       </Formik>
     </Box>
   );
-};
-
-// Validation Schema
-const checkoutSchema = yup.object().shape({
-  fullName: yup
-    .string()
-    .required("Full Name is required")
-    .matches(/^[A-Za-z\s]+$/, "Full Name must contain only alphabetic characters and spaces"),
-  username: yup.string().required("Username is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
-});
-
-// Initial Values
-const initialValues = {
-  fullName: "",
-  username: "",
-  email: "",
-  password: "",
 };
 
 export default AddAdmin;
