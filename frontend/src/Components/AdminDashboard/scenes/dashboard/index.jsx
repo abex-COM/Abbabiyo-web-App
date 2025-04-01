@@ -12,16 +12,89 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
+import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
+
+// Translation dictionary for the Dashboard
+const dashboardTranslations = {
+  en: {
+    dashboardTitle: "DASHBOARD",
+    dashboardSubtitle: "Welcome to your dashboard",
+    downloadReports: "Download Reports",
+    emailsSent: "Emails Sent",
+    salesObtained: "Sales Obtained",
+    newClients: "New Clients",
+    trafficReceived: "Traffic Received",
+    revenueGenerated: "Revenue Generated",
+    recentTransactions: "Recent Transactions",
+    campaign: "Campaign",
+    salesQuantity: "Sales Quantity",
+    geographyBasedTraffic: "Geography Based Traffic",
+    revenueGeneratedText: "$48,352 revenue generated",
+    includesExtraCosts: "Includes extra misc expenditures and costs",
+  },
+  am: {
+    dashboardTitle: "ዳሽቦርድ",
+    dashboardSubtitle: "ወደ ዳሽቦርድዎ እንኳን በደህና መጡ",
+    downloadReports: "ሪፖርቶችን አውርድ",
+    emailsSent: "ኢሜሎች ተልከዋል",
+    salesObtained: "የተገኙ ሽያጮች",
+    newClients: "አዲስ ደንበኞች",
+    trafficReceived: "የተቀበለ ትራፊክ",
+    revenueGenerated: "የሚገኝ ገቢ",
+    recentTransactions: "የቅርብ ጊዜ ግብይቶች",
+    campaign: "ዘመቻ",
+    salesQuantity: "የሽያጭ ብዛት",
+    geographyBasedTraffic: "በጂኦግራፊ ላይ የተመሰረተ ትራፊክ",
+    revenueGeneratedText: "$48,352 ገቢ ተፈጥሯል",
+    includesExtraCosts: "ተጨማሪ ወጪዎችን ያጠቃልላል",
+  },
+  om: {
+    dashboardTitle: "Daashboordii",
+    dashboardSubtitle: "Baga daashboordii kee seenaa",
+    downloadReports: "Raapportii dhiyeessuu",
+    emailsSent: "Imeelii ergame",
+    salesObtained: "Gatii gurguramaa",
+    newClients: "Miseensota haaraa",
+    trafficReceived: "Traafiifi qabadame",
+    revenueGenerated: "Mallaqa argame",
+    recentTransactions: "Gareen walqabsiisaa",
+    campaign: "Kaampaanii",
+    salesQuantity: "Gatii gurguramaa",
+    geographyBasedTraffic: "Traafiifi geografii irratti hundaa’e",
+    revenueGeneratedText: "$48,352 mallaqa argame",
+    includesExtraCosts: "Kostii dabalataa ni hammata",
+  },
+  ti: {
+    dashboardTitle: "ዳሽቦርድ",
+    dashboardSubtitle: "ናብ ዳሽቦርድካ ብደሓን መጻእካ",
+    downloadReports: "ሪፖርት ምውራድ",
+    emailsSent: "ኢሜል ተልኪኡ",
+    salesObtained: "ዝተገዝአ ሽያጭ",
+    newClients: "ሓደስቲ �ላዕለይ",
+    trafficReceived: "ትራፊክ ተቐቢሉ",
+    revenueGenerated: "ገቢ ተፈጢሩ",
+    recentTransactions: "ቀረባ ግብይት",
+    campaign: "ካምፓን",
+    salesQuantity: "ብዝሒ ሽያጭ",
+    geographyBasedTraffic: "ትራፊክ ኣብ ጂኦግራፊ ዝተመስረተ",
+    revenueGeneratedText: "$48,352 ገቢ ተፈጢሩ",
+    includesExtraCosts: "ወጻኢታት የሕልና ወጪ የሚያካትት",
+  },
+};
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { language } = useLanguage(); // Get the current language
 
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+        <Header
+          title={dashboardTranslations[language].dashboardTitle}
+          subtitle={dashboardTranslations[language].dashboardSubtitle}
+        />
 
         <Box>
           <Button
@@ -31,14 +104,14 @@ const Dashboard = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
-              borderRadius: "5px", // Add border radius
+              borderRadius: "5px",
               "&:hover": {
-                backgroundColor: colors.blueAccent[800], // Optional: Change background color on hover
+                backgroundColor: colors.blueAccent[800],
               },
             }}
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
+            {dashboardTranslations[language].downloadReports}
           </Button>
         </Box>
       </Box>
@@ -58,16 +131,16 @@ const Dashboard = () => {
           alignItems="center"
           justifyContent="center"
           sx={{
-            borderRadius: "5px", // Add border radius
-            transition: "transform 0.3s ease", // Smooth transition
+            borderRadius: "5px",
+            transition: "transform 0.3s ease",
             "&:hover": {
-              transform: "scale(1.05)", // Scale up on hover
+              transform: "scale(1.05)",
             },
           }}
         >
           <StatBox
             title="12,361"
-            subtitle="Emails Sent"
+            subtitle={dashboardTranslations[language].emailsSent}
             progress="0.75"
             increase="+14%"
             icon={
@@ -93,7 +166,7 @@ const Dashboard = () => {
         >
           <StatBox
             title="431,225"
-            subtitle="Sales Obtained"
+            subtitle={dashboardTranslations[language].salesObtained}
             progress="0.50"
             increase="+21%"
             icon={
@@ -119,7 +192,7 @@ const Dashboard = () => {
         >
           <StatBox
             title="32,441"
-            subtitle="New Clients"
+            subtitle={dashboardTranslations[language].newClients}
             progress="0.30"
             increase="+5%"
             icon={
@@ -145,7 +218,7 @@ const Dashboard = () => {
         >
           <StatBox
             title="1,325,134"
-            subtitle="Traffic Received"
+            subtitle={dashboardTranslations[language].trafficReceived}
             progress="0.80"
             increase="+43%"
             icon={
@@ -165,7 +238,7 @@ const Dashboard = () => {
             borderRadius: "5px",
             transition: "transform 0.3s ease",
             "&:hover": {
-              transform: "scale(1.02)", // Slightly smaller scale for larger boxes
+              transform: "scale(1.02)",
             },
           }}
         >
@@ -182,7 +255,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Revenue Generated
+                {dashboardTranslations[language].revenueGenerated}
               </Typography>
               <Typography
                 variant="h3"
@@ -226,7 +299,7 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Transactions
+              {dashboardTranslations[language].recentTransactions}
             </Typography>
           </Box>
           {mockTransactions.map((transaction, i) => (
@@ -277,7 +350,7 @@ const Dashboard = () => {
           }}
         >
           <Typography variant="h5" fontWeight="600">
-            Campaign
+            {dashboardTranslations[language].campaign}
           </Typography>
           <Box
             display="flex"
@@ -291,9 +364,11 @@ const Dashboard = () => {
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
             >
-              $48,352 revenue generated
+              {dashboardTranslations[language].revenueGeneratedText}
             </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
+            <Typography>
+              {dashboardTranslations[language].includesExtraCosts}
+            </Typography>
           </Box>
         </Box>
         <Box
@@ -313,7 +388,7 @@ const Dashboard = () => {
             fontWeight="600"
             sx={{ padding: "30px 30px 0 30px" }}
           >
-            Sales Quantity
+            {dashboardTranslations[language].salesQuantity}
           </Typography>
           <Box height="250px" mt="-20px">
             <BarChart isDashboard={true} />
@@ -337,7 +412,7 @@ const Dashboard = () => {
             fontWeight="600"
             sx={{ marginBottom: "15px" }}
           >
-            Geography Based Traffic
+            {dashboardTranslations[language].geographyBasedTraffic}
           </Typography>
           <Box height="200px">
             <GeographyChart isDashboard={true} />
