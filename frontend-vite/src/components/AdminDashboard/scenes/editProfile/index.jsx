@@ -4,17 +4,17 @@ import * as yup from "yup";
 import { tokens } from "../../theme";
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import axios from "axios";
-import { useState, useEffect } from "react";
-import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
-import { ToastContainer, toast } from 'react-toastify'; // Import toast
-import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
+import { useState, useEffect, useRef } from "react";
+import defaultProfilePic from "../../assets/default.png";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const EditProfile = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  // State for user data fetched from the backend
   const [user, setUser] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -22,31 +22,44 @@ const EditProfile = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from JWT
+      const userId = JSON.parse(atob(token.split('.')[1])).id;
 
       try {
         const response = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(response.data.user); // Update state with user data
+        setUser(response.data.user);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to fetch user data"); // Toast for error
+        toast.error("Failed to fetch user data");
       }
     };
 
     fetchUserData();
   }, []);
 
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Create a preview URL for the selected image
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      
+      // Update Formik's form data with the new file
+      setUser((prevUser) => ({ ...prevUser, profileImage: file }));
+    }
+  };
+
   // Handle form submission
   const handleFormSubmit = async (values, { resetForm }) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.error("You must be logged in to update your profile."); // Toast for error
+      toast.error("You must be logged in to update your profile.");
       return;
     }
 
-    const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from JWT
+    const userId = JSON.parse(atob(token.split('.')[1])).id;
 
     const formDataToSend = new FormData();
     formDataToSend.append("fullName", values.fullName);
@@ -56,7 +69,7 @@ const EditProfile = () => {
       formDataToSend.append("password", values.password);
     }
     if (values.profileImage) {
-      formDataToSend.append("profileImage", values.profileImage); // Append the file object
+      formDataToSend.append("profileImage", values.profileImage);
     }
 
     try {
@@ -70,26 +83,45 @@ const EditProfile = () => {
           },
         }
       );
-
-      toast.success(response.data.message); // Toast for success
-
-      // Refetch user data to update the state
-      const updatedUserResponse = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(updatedUserResponse.data.user);
-
+    
+      toast.success(response.data.message);
+    
+      // Clear the preview after successful upload
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+        setImagePreview(null);
+      }
+    
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    
       // Clear inputs after successful update
       resetForm();
+    
+      // Force a full page reload after 1 second to show updated data everywhere
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Failed to update profile."); // Toast for error
+      toast.error(err.response?.data?.message || "Failed to update profile.");
     }
   };
 
+  // Clean up the object URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
   return (
     <Box m="20px">
-      {/* Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -102,7 +134,6 @@ const EditProfile = () => {
         pauseOnHover
       />
 
-      {/* Title */}
       <Typography
         variant="h3"
         color={colors.grey[100]}
@@ -123,14 +154,16 @@ const EditProfile = () => {
         >
           <img
             alt="profile-user"
-            src={user?.profileImage ? `http://localhost:5000/uploads/${user.profileImage}` : defaultProfilePic}
+            src={
+              imagePreview || 
+              (user?.profileImage ? `http://localhost:5000/uploads/${user.profileImage}` : defaultProfilePic)
+            }
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
             }}
             onError={(e) => {
-              // Fallback to default image if the profile image fails to load
               e.target.src = defaultProfilePic;
             }}
           />
@@ -148,13 +181,8 @@ const EditProfile = () => {
             type="file"
             hidden
             accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                // Update Formik's form data with the new file
-                setUser((prevUser) => ({ ...prevUser, profileImage: file }));
-              }
-            }}
+            ref={fileInputRef}
+            onChange={handleImageChange}
           />
         </IconButton>
       </Box>
@@ -171,7 +199,7 @@ const EditProfile = () => {
           profileImage: user?.profileImage || null,
         }}
         validationSchema={checkoutSchema}
-        enableReinitialize // Reinitialize form when user data changes
+        enableReinitialize
       >
         {({
           values,
@@ -183,7 +211,6 @@ const EditProfile = () => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Box display="flex" flexDirection="column" gap="20px">
-              {/* Full Name */}
               <TextField
                 fullWidth
                 label="Full Name"
@@ -197,7 +224,6 @@ const EditProfile = () => {
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
-              {/* Email */}
               <TextField
                 fullWidth
                 label="Email"
@@ -211,7 +237,6 @@ const EditProfile = () => {
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
-              {/* Username */}
               <TextField
                 fullWidth
                 label="Username"
@@ -225,7 +250,6 @@ const EditProfile = () => {
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
-              {/* Password */}
               <TextField
                 fullWidth
                 label="Password"
@@ -240,7 +264,6 @@ const EditProfile = () => {
                 sx={{ backgroundColor: colors.primary[400] }}
               />
 
-              {/* Confirm Password */}
               <TextField
                 fullWidth
                 label="Confirm Password"
@@ -256,7 +279,6 @@ const EditProfile = () => {
               />
             </Box>
 
-            {/* Save Changes Button */}
             <Box display="flex" justifyContent="end" mt="20px">
               <Button
                 type="submit"
@@ -264,8 +286,8 @@ const EditProfile = () => {
                 sx={{
                   backgroundColor: colors.greenAccent[500],
                   "&:hover": {
-                    transform: "none", // Disable size increase on hover
-                    backgroundColor: colors.greenAccent[600], // Keep the same background color on hover
+                    transform: "none",
+                    backgroundColor: colors.greenAccent[600],
                   },
                 }}
               >
@@ -279,7 +301,6 @@ const EditProfile = () => {
   );
 };
 
-// Validation Schema
 const checkoutSchema = yup.object().shape({
   fullName: yup
     .string()

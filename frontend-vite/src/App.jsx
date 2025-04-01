@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginRegister from './Components/LoginRegister/LoginRegister';
-import AdminDashboard from './Components/AdminDashboard/AdminDashboard';
+import LoginRegister from './components/LoginRegister/LoginRegister';
+import AdminDashboard from './components/AdminDashboard/AdminDashboard';
 
 function App() {
   // Helper function to check if the user is authenticated
