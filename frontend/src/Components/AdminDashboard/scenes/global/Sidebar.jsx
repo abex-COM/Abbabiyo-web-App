@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ProSidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
-import 'react-pro-sidebar/dist/css/styles.css';
+import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
+import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -40,7 +40,7 @@ const sidebarTranslations = {
     Charts: "Charts",
     SuperAdmin: "Super Admin",
     Admin: "Admin",
-    Manage: "Manage", 
+    Manage: "Manage",
   },
   am: {
     Dashboard: "ዳሽቦርድ",
@@ -61,7 +61,7 @@ const sidebarTranslations = {
     Charts: "ገበታዎች",
     SuperAdmin: "ሱፐር አስተዳዳሪ",
     Admin: "አስተዳዳሪ",
-    Manage: "አስተዳደር", 
+    Manage: "አስተዳደር",
   },
   om: {
     Dashboard: "Daashboordii",
@@ -73,16 +73,16 @@ const sidebarTranslations = {
     PieChart: "Pie Chaartii",
     LineChart: "Layin Chaartii",
     GeographyChart: "Jiyoogiraafii Chaartii",
-    Admins: "Manaajiin",
+    Admins: "Bulchaa",
     Team: "Garee",
     CreateAdmin: "Manaajii Uumu",
     Data: "Daataa",
     Pages: "Fuulli",
     Calendar: "Kalindarii",
     Charts: "Chaartii",
-    SuperAdmin: "Manaajii Guddaa",
-    Admin: "Manaajii",
-    Manage: "Bulchiinsa", 
+    SuperAdmin: "Bulchaa Ol-aanaa",
+    Admin: "Bulchaa",
+    Manage: "Manaajii",
   },
   ti: {
     Dashboard: "ዳሽቦርድ",
@@ -103,11 +103,18 @@ const sidebarTranslations = {
     Charts: "ገበታታት",
     SuperAdmin: "ሱፐር ኣስተዳደርቲ",
     Admin: "ኣስተዳደርቲ",
-    Manage: "ምምሕዳር", 
+    Manage: "ምምሕዳር",
   },
 };
 
-const Item = ({ title, icon, selected, setSelected, setCurrentView, closeDropdowns }) => {
+const Item = ({
+  title,
+  icon,
+  selected,
+  setSelected,
+  setCurrentView,
+  closeDropdowns,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { language } = useLanguage(); // Get the current language
@@ -202,20 +209,24 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const userId = JSON.parse(atob(token.split('.')[1])).id; // Extract user ID from JWT
+      const userId = JSON.parse(atob(token.split(".")[1])).id; // Extract user ID from JWT
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/auth/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          `http://localhost:5000/api/admin/get-admin/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         // Update state with user data
-        setUser(response.data.user);
-
+        setUser(response.data.admin);
         // Log the image path for debugging
         console.log(
           "Image Path:",
-          response.data.user?.profileImage ? `/uploads/${response.data.user.profileImage}` : defaultProfilePic
+          response.data.user?.profileImage
+            ? `/uploads/${response.data.user.profileImage}`
+            : defaultProfilePic
         );
       } catch (err) {
         console.error(err);
@@ -311,7 +322,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               <img
                 alt="profile-user"
-                src={user?.profileImage ? `http://localhost:5000/uploads/${user.profileImage}` : defaultProfilePic}
+                src={
+                  user?.profileImage
+                    ? `http://localhost:5000/uploads/${user.profileImage}`
+                    : defaultProfilePic
+                }
                 style={{
                   width: "100%",
                   height: "100%",
@@ -334,7 +349,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   {user?.fullName || "Fira Teferi"}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  {user?.role === "superadmin" ? sidebarTranslations[language].SuperAdmin : sidebarTranslations[language].Admin}
+                  {user?.role === "superadmin"
+                    ? sidebarTranslations[language].SuperAdmin
+                    : sidebarTranslations[language].Admin}
                 </Typography>
               </Box>
             )}
@@ -417,7 +434,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                 closeDropdowns={closeDropdowns} // Pass closeDropdowns function
               />
             </SubMenu>
-            
+
             <Item
               title="ContactsInformation"
               icon={<ContactsOutlinedIcon />}

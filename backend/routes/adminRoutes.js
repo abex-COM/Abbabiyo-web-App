@@ -1,84 +1,41 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User = require('../models/User');
-const roleMiddleware = require('../middleware/roleMiddleware');
+const roleMiddleware = require("../middleware/roleMiddleware");
+const {
+  createAdmin,
+  updateAdmin,
+  deleteAdmin,
+  updateAdminProfile,
+  registerSuperAdmin,
+  getAdminById,
+  getAdmins,
+} = require("../controllers/adminController");
+const upload = require("../middleware/upload");
+const authController = require("../controllers/authController");
+
+// Existing routes...
+router.post("/login", authController.login);
 
 // Fetch all admins (only Super Admin can access)
-router.get('/admins', roleMiddleware('superadmin'), async (req, res) => {
-  try {
-    // Fetch all users with the role 'admin'
-    const admins = await User.find({ role: 'admin' });
-    res.status(200).json(admins);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
-
+router.get("/get-all-admin", getAdmins);
 // Create an admin (only Super Admin)
-router.post('/admins', roleMiddleware('superadmin'), async (req, res) => {
-  const { fullName, username, email, password } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Username or email already exists' });
-    }
-
-    const admin = new User({ fullName, username, email, password, role: 'admin' });
-    await admin.save();
-
-    res.status(201).json({ message: 'Admin created successfully', admin });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
+router.post("/create", roleMiddleware("superadmin"), createAdmin);
 
 // Update an admin (only Super Admin)
-router.put('/admins/:id', roleMiddleware('superadmin'), async (req, res) => {
-  const { id } = req.params;
-  const { fullName, username, email, password } = req.body;
-
-  try {
-    const admin = await User.findById(id);
-
-    if (!admin || admin.role !== 'admin') {
-      return res.status(404).json({ message: 'Admin not found' });
-    }
-
-    // Update admin fields
-    admin.fullName = fullName || admin.fullName;
-    admin.username = username || admin.username;
-    admin.email = email || admin.email;
-
-    if (password) {
-      // Hash the new password before saving it
-      const salt = await bcrypt.genSalt(10);
-      admin.password = await bcrypt.hash(password, salt);
-    }
-
-    await admin.save();
-
-    res.status(200).json({ message: 'Admin updated successfully', admin });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
+router.put("/update/:id", roleMiddleware("superadmin"), updateAdmin);
 
 // Delete an admin (only Super Admin)
-router.delete('/admins/:id', roleMiddleware('superadmin'), async (req, res) => {
-  const { id } = req.params;
+router.delete("/delete/:id", roleMiddleware("superadmin"), deleteAdmin);
+// for developmen only
+router.post("/register-superadmin", registerSuperAdmin);
 
-  try {
-    const admin = await User.findByIdAndDelete(id);
-
-    if (!admin || admin.role !== 'admin') {
-      return res.status(404).json({ message: 'Admin not found' });
-    }
-
-    res.status(200).json({ message: 'Admin deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
+// New route for updating profile
+router.put(
+  "/update-profile/:id",
+  upload.single("profileImage"),
+  updateAdminProfile
+);
+// New route for fetching a single admin by ID (only Super Admin can access)
+router.get("/get-admin/:id", getAdminById);
 
 module.exports = router;

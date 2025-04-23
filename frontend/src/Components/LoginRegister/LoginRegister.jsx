@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { FaUser, FaLock } from 'react-icons/fa';
-import { FaRegMoon } from 'react-icons/fa6';
+import React, { useState, useEffect } from "react";
+import { FaUser, FaLock } from "react-icons/fa";
+import { FaRegMoon } from "react-icons/fa6";
 import { MdOutlineLanguage } from "react-icons/md";
 import { TiWeatherSunny } from "react-icons/ti";
-import { login } from './api'; 
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './LoginRegister.css';
-import { tokens } from './theme';
-
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./LoginRegister.css";
+import { tokens } from "./theme";
+import axios from "axios";
 // Translation dictionary
 const translations = {
   en: {
@@ -43,24 +42,30 @@ const translations = {
 };
 
 // Language Dropdown Component
-const LanguageDropdown = ({ onLanguageChange, isOpen, onMouseEnter, onMouseLeave, colors }) => {
+const LanguageDropdown = ({
+  onLanguageChange,
+  isOpen,
+  onMouseEnter,
+  onMouseLeave,
+  colors,
+}) => {
   const languages = [
-    { code: 'en', name: 'Eng' },
-    { code: 'am', name: 'Amh' },
-    { code: 'om', name: 'A/O' },
-    { code: 'ti', name: 'Tig' },
+    { code: "en", name: "Eng" },
+    { code: "am", name: "Amh" },
+    { code: "om", name: "A/O" },
+    { code: "ti", name: "Tig" },
   ];
 
   return (
     <div
       style={{
-        position: 'absolute',
-        right: '0',
-        top: '40px',
+        position: "absolute",
+        right: "0",
+        top: "40px",
         backgroundColor: colors.primary[500],
-        borderRadius: '10px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        display: isOpen ? 'block' : 'none',
+        borderRadius: "10px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        display: isOpen ? "block" : "none",
         zIndex: 1000,
         color: colors.grey[100],
       }}
@@ -72,14 +77,14 @@ const LanguageDropdown = ({ onLanguageChange, isOpen, onMouseEnter, onMouseLeave
           key={lang.code}
           onClick={() => onLanguageChange(lang.code)}
           style={{
-            padding: '10px',
-            cursor: 'pointer',
+            padding: "10px",
+            cursor: "pointer",
             color: colors.grey[100],
-            borderBottom: '1px solid #ddd',
-            transition: 'color 0.3s ease',
-            backgroundColor: 'transparent',
+            borderBottom: "1px solid #ddd",
+            transition: "color 0.3s ease",
+            backgroundColor: "transparent",
           }}
-          onMouseEnter={(e) => (e.target.style.color = '#00bfff')}
+          onMouseEnter={(e) => (e.target.style.color = "#00bfff")}
           onMouseLeave={(e) => (e.target.style.color = colors.grey[100])}
         >
           {lang.name}
@@ -92,21 +97,21 @@ const LanguageDropdown = ({ onLanguageChange, isOpen, onMouseEnter, onMouseLeave
 // Main Login Component
 const LoginRegister = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [isNightMode, setIsNightMode] = useState(false);
-  const [language, setLanguage] = useState('en'); // Default to English
+  const [language, setLanguage] = useState("en"); // Default to English
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   // Initialize language from session storage or browser preference
   useEffect(() => {
-    const savedLanguage = sessionStorage.getItem('preferredLanguage');
+    const savedLanguage = sessionStorage.getItem("preferredLanguage");
     if (savedLanguage) {
       setLanguage(savedLanguage);
     } else {
-      const userLanguage = navigator.language.split('-')[0];
+      const userLanguage = navigator.language.split("-")[0];
       if (translations[userLanguage]) {
         setLanguage(userLanguage);
       }
@@ -121,18 +126,19 @@ const LoginRegister = () => {
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
     try {
-      const res = await login({
-        username: formData.username,
-        password: formData.password,
-      });
+      const res = await axios.post(
+        `http://localhost:5000/api/admin/login`,
+        formData
+      );
+      console.log("Login response:", res.data); // Log the response for debugging
 
       const { token } = res.data;
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
 
       // Navigate to the admin page
-      navigate('/admin', { replace: true }); // Use replace to prevent re-submission on refresh
+      navigate("/admin", { replace: true }); // Use replace to prevent re-submission on refresh
 
-      toast.success('Login successful!', {
+      toast.success("Login successful!", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -141,19 +147,23 @@ const LoginRegister = () => {
         draggable: true,
       });
     } catch (error) {
-      console.error('Login failed:', error.response?.data || error.message);
-      toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      console.error("Login failed:", error.response?.data || error.message);
+      toast.error(
+        error.response?.data?.message ||
+          "Login failed. Please check your credentials.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
     } finally {
       setFormData({
-        username: '',
-        password: '',
+        username: "",
+        password: "",
       });
     }
   };
@@ -164,7 +174,7 @@ const LoginRegister = () => {
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
-    sessionStorage.setItem('preferredLanguage', lang);
+    sessionStorage.setItem("preferredLanguage", lang);
     setIsLanguageDropdownOpen(false);
   };
 
@@ -172,40 +182,56 @@ const LoginRegister = () => {
     setIsLanguageDropdownOpen(isOpen);
   };
 
-  const colors = tokens(isNightMode ? 'light' : 'dark');
+  const colors = tokens(isNightMode ? "light" : "dark");
 
   return (
-    <div className={`containerbox ${isNightMode ? 'day-mode' : 'night-mode'}`} style={{ backgroundColor: colors.primary[500] }}>
-      <div style={{ position: 'absolute', top: '20px', right: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div className="theme-toggle" onClick={toggleTheme} style={{ color: colors.grey[100] }}>
+    <div
+      className={`containerbox ${isNightMode ? "day-mode" : "night-mode"}`}
+      style={{ backgroundColor: colors.primary[500] }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <div
+          className="theme-toggle"
+          onClick={toggleTheme}
+          style={{ color: colors.grey[100] }}
+        >
           {isNightMode ? <TiWeatherSunny /> : <FaRegMoon />}
         </div>
         <div
           onMouseEnter={(e) => {
             toggleLanguageDropdown(true);
-            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.style.transform = "scale(1.05)";
             e.currentTarget.style.border = `2px solid ${colors.greenAccent[500]}`;
             e.currentTarget.style.backgroundColor = colors.primary[400];
           }}
           onMouseLeave={(e) => {
             toggleLanguageDropdown(false);
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.border = 'none';
-            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.border = "none";
+            e.currentTarget.style.backgroundColor = "transparent";
           }}
           style={{
-            cursor: 'pointer',
+            cursor: "pointer",
             color: colors.grey[100],
-            position: 'absolute',
-            right: '20px',
-            top: '80px',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: '50%',
-            transition: 'all 0.3s ease',
+            position: "absolute",
+            right: "20px",
+            top: "80px",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: "50%",
+            transition: "all 0.3s ease",
           }}
         >
           <MdOutlineLanguage size={25} />
@@ -218,7 +244,13 @@ const LoginRegister = () => {
           />
         </div>
       </div>
-      <div className="wrapper" style={{ backgroundColor: colors.primary[400], color: colors.grey[100] }}>
+      <div
+        className="wrapper"
+        style={{
+          backgroundColor: colors.primary[400],
+          color: colors.grey[100],
+        }}
+      >
         {/* Login Form */}
         <div className="form-box login">
           <form onSubmit={handleLogin}>
@@ -231,7 +263,10 @@ const LoginRegister = () => {
                 value={formData.username}
                 onChange={handleChange}
                 required
-                style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}
+                style={{
+                  color: colors.grey[100],
+                  border: `1px solid ${colors.grey[100]}`,
+                }}
               />
               <FaUser className="icon" style={{ color: colors.grey[100] }} />
             </div>
@@ -243,7 +278,10 @@ const LoginRegister = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}
+                style={{
+                  color: colors.grey[100],
+                  border: `1px solid ${colors.grey[100]}`,
+                }}
               />
               <FaLock className="icon" style={{ color: colors.grey[100] }} />
             </div>
@@ -252,13 +290,27 @@ const LoginRegister = () => {
                 <input type="checkbox" /> {translations[language].rememberMe}
               </label>
               <span
-                onClick={() => { /* Add your logic here, e.g., open a modal */ }}
-                style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}
+                onClick={() => {
+                  /* Add your logic here, e.g., open a modal */
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "inherit",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
               >
                 {translations[language].forgotPassword}
               </span>
             </div>
-            <button type="submit" style={{ color: colors.grey[100], border: `1px solid ${colors.grey[100]}` }}>
+            <button
+              type="submit"
+              style={{
+                color: colors.grey[100],
+                border: `1px solid ${colors.grey[100]}`,
+              }}
+            >
               {translations[language].login}
             </button>
           </form>
