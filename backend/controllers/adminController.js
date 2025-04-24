@@ -1,5 +1,7 @@
 const Admin = require("../models/adminModel");
 const bcrypt = require("bcryptjs");
+const User = require("../models/userModel"); // Adjust based on your model
+
 const fs = require("fs");
 const path = require("path");
 
@@ -190,6 +192,25 @@ const getAdminById = async (req, res) => {
   }
 };
 
+// routes/userRoutes.js
+const getDashboardData = async (req, res) => {
+  try {
+    const farmers = await User.find(); // Or role: "farmer"
+    const admins = await Admin.find();
+
+    // Example: map farmers to get number of sales or campaigns they’re involved in
+    const data = {
+      totalFarmers: farmers.length,
+      totalAdmins: admins.length,
+      // You can add other computations here
+    };
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createAdmin,
   updateAdmin,
@@ -198,4 +219,5 @@ module.exports = {
   updateAdminProfile,
   registerSuperAdmin,
   getAdminById,
+  getDashboardData,
 };

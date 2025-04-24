@@ -4,8 +4,8 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
 
 // Translation dictionary
@@ -22,12 +22,13 @@ const addAdminTranslations = {
     error: "An unexpected error occurred. Please try again.",
     validation: {
       fullNameRequired: "Full Name is required",
-      fullNameInvalid: "Full Name must contain only alphabetic characters and spaces",
+      fullNameInvalid:
+        "Full Name must contain only alphabetic characters and spaces",
       usernameRequired: "Username is required",
       emailInvalid: "Invalid email",
       emailRequired: "Email is required",
-      passwordRequired: "Password is required"
-    }
+      passwordRequired: "Password is required",
+    },
   },
   am: {
     title: "አዲስ አስተዳዳሪ ይፍጠሩ",
@@ -45,8 +46,8 @@ const addAdminTranslations = {
       usernameRequired: "የተጠቃሚ ስም ያስፈልጋል",
       emailInvalid: "ልክ ያልሆነ ኢሜይል",
       emailRequired: "ኢሜይል ያስፈልጋል",
-      passwordRequired: "የይለፍ ቃል ያስፈልጋል"
-    }
+      passwordRequired: "የይለፍ ቃል ያስፈልጋል",
+    },
   },
   om: {
     title: "ADMINISTRAATORAA UUMUU",
@@ -64,8 +65,8 @@ const addAdminTranslations = {
       usernameRequired: "Maqaa fayyadamaa barbaachisa",
       emailInvalid: "Imeelii sirrii miti",
       emailRequired: "Imeelii barbaachisa",
-      passwordRequired: "Jecha iccitii barbaachisa"
-    }
+      passwordRequired: "Jecha iccitii barbaachisa",
+    },
   },
   ti: {
     title: "ኣስተዳደርቲ ምፍጣር",
@@ -83,9 +84,9 @@ const addAdminTranslations = {
       usernameRequired: "ስም ተጠቃሚ የድሊ",
       emailInvalid: "ዘይቅኑዕ ኢመይል",
       emailRequired: "ኢመይል የድሊ",
-      passwordRequired: "ቃል ምልጃ የድሊ"
-    }
-  }
+      passwordRequired: "ቃል ምልጃ የድሊ",
+    },
+  },
 };
 
 const AddAdmin = () => {
@@ -98,7 +99,7 @@ const AddAdmin = () => {
 
       // Send a POST request to create a new admin
       const response = await axios.post(
-        "http://localhost:5000/api/admin/admins",
+        "http://localhost:5000/api/admin/create",
         values,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -106,10 +107,15 @@ const AddAdmin = () => {
       );
 
       // Use the success message from the backend response
-      toast.success(response.data.message || addAdminTranslations[language].success);
+      toast.success(
+        response.data.message || addAdminTranslations[language].success
+      );
       resetForm();
     } catch (error) {
-      console.error("Error creating admin:", error.response?.data || error.message);
+      console.error(
+        "Error creating admin:",
+        error.response?.data || error.message
+      );
 
       // Use the error message from the backend response
       if (error.response?.data?.message) {
@@ -127,12 +133,20 @@ const AddAdmin = () => {
     fullName: yup
       .string()
       .required(addAdminTranslations[language].validation.fullNameRequired)
-      .matches(/^[A-Za-z\s]+$/, addAdminTranslations[language].validation.fullNameInvalid),
-    username: yup.string().required(addAdminTranslations[language].validation.usernameRequired),
-    email: yup.string()
+      .matches(
+        /^[A-Za-z\s]+$/,
+        addAdminTranslations[language].validation.fullNameInvalid
+      ),
+    username: yup
+      .string()
+      .required(addAdminTranslations[language].validation.usernameRequired),
+    email: yup
+      .string()
       .email(addAdminTranslations[language].validation.emailInvalid)
       .required(addAdminTranslations[language].validation.emailRequired),
-    password: yup.string().required(addAdminTranslations[language].validation.passwordRequired),
+    password: yup
+      .string()
+      .required(addAdminTranslations[language].validation.passwordRequired),
   });
 
   // Initial Values
@@ -159,9 +173,9 @@ const AddAdmin = () => {
       />
 
       {/* Header */}
-      <Header 
-        title={addAdminTranslations[language].title} 
-        subtitle={addAdminTranslations[language].subtitle} 
+      <Header
+        title={addAdminTranslations[language].title}
+        subtitle={addAdminTranslations[language].subtitle}
       />
 
       {/* Formik Form */}

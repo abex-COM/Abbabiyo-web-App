@@ -11,7 +11,9 @@ const AdminSchema = new mongoose.Schema({
     type: String,
     enum: ["superadmin", "admin", "user"],
     default: "admin",
-  }, // Add more roles as needed
+  },
+  failedAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Date, default: null },
 });
 
 // Hash the password before saving the admin

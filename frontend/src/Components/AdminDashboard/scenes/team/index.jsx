@@ -18,19 +18,19 @@ import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
 
 // Translation dictionary
-const teamTranslations = {
+export const teamTranslations = {
   en: {
     title: "FARMERS",
     subtitle: "Managing the Farmers",
     id: "ID",
-    fullName: "Full Name",
-    username: "Username",
+    name: "Full Name",
     email: "Email",
+    phoneNumber: "Phone Number",
     farmName: "Farm Name",
-    location: "Location",
-    crops: "Crops",
+    region: "Region",
+    zone: "Zone",
+    woreda: "Woreda",
     actions: "Actions",
-    noCrops: "No crops",
     edit: "Edit",
     delete: "Delete",
     deleteSuccess: "Farmer deleted successfully!",
@@ -39,25 +39,26 @@ const teamTranslations = {
     updateError: "Failed to update farmer. Please try again.",
     cancel: "Cancel",
     save: "Save",
-    fullNameLabel: "Full Name",
-    usernameLabel: "Username",
+    nameLabel: "Full Name",
+    phoneNumberLabel: "Phone Number",
     emailLabel: "Email",
     farmNameLabel: "Farm Name",
-    locationLabel: "Location",
-    cropsLabel: "Crops (comma separated)",
+    regionLabel: "Region",
+    zoneLabel: "Zone",
+    woredaLabel: "Woreda",
   },
   am: {
     title: "ገበሬዎች",
     subtitle: "ገበሬዎችን ማስተዳደር",
     id: "መለያ",
-    fullName: "ሙሉ ስም",
-    username: "የተጠቃሚ ስም",
+    name: "ሙሉ ስም",
     email: "ኢሜይል",
+    phoneNumber: "ስልክ ቁጥር",
     farmName: "የግብርና ስም",
-    location: "ቦታ",
-    crops: "የተለማመዱ እምቦታዎች",
+    region: "ክልል",
+    zone: "ዞን",
+    woreda: "ወረዳ",
     actions: "ድርጊቶች",
-    noCrops: "እምቦታዎች የሉም",
     edit: "አርትዕ",
     delete: "ሰርዝ",
     deleteSuccess: "ገበሬ በተሳካ ሁኔታ ተሰርዟል!",
@@ -66,52 +67,55 @@ const teamTranslations = {
     updateError: "ገበሬን ማዘመን አልተቻለም። እባክዎ ደግመው ይሞክሩ።",
     cancel: "ሰርዝ",
     save: "አስቀምጥ",
-    fullNameLabel: "ሙሉ ስም",
-    usernameLabel: "የተጠቃሚ ስም",
+    nameLabel: "ሙሉ ስም",
+    phoneNumberLabel: "ስልክ ቁጥር",
     emailLabel: "ኢሜይል",
     farmNameLabel: "የግብርና ስም",
-    locationLabel: "ቦታ",
-    cropsLabel: "የተለማመዱ እምቦታዎች (በነጠላ ሰረዝ የተለዩ)",
+    regionLabel: "ክልል",
+    zoneLabel: "ዞን",
+    woredaLabel: "ወረዳ",
   },
   om: {
-    title: "QEERANSOOTA",
-    subtitle: "Qeeransoota bulchuu",
+    title: "QONNAAWAN",
+    subtitle: "Qonnaawwan To'achuuf",
     id: "ID",
-    fullName: "Maqaa Guutuu",
-    username: "Maqaa Fayyadamaa",
+    name: "Maqaa Guutuu",
     email: "Imeelii",
+    phoneNumber: "Lakkoofsa Bilbilaa",
     farmName: "Maqaa Qonnaa",
-    location: "Bakka",
-    crops: "Mala Qonnaa",
+    region: "Naannoo",
+    zone: "Godina",
+    woreda: "Aanaa",
     actions: "Hojiiwwan",
-    noCrops: "Mala Qonnaa hin jiru",
-    edit: "Sirreessuu",
-    delete: "Haquu",
-    deleteSuccess: "Qeeransichii muuxannoo ta'een haqame!",
-    deleteError: "Qeeransichii haquu hindandeenye. Irra deebi'ii yaali.",
-    updateSuccess: "Qeeransichii muuxannoo ta'een sirreeffame!",
-    updateError: "Qeeransichii sirreessuu hindandeenye. Irra deebi'ii yaali.",
+    edit: "Sirreessi",
+    delete: "Haqi",
+    deleteSuccess: "Qonnaan bultichi milkaa’inaan haquame!",
+    deleteError: "Qonnaan bulticha haquu hin dandeenye. Irra deebi'i yaali.",
+    updateSuccess: "Qonnaan bultichi milkaa’inaan haaromsame!",
+    updateError:
+      "Qonnaan bulticha haaromsuu hin dandeenye. Irra deebi’i yaali.",
     cancel: "Haquu",
-    save: "Qabachuu",
-    fullNameLabel: "Maqaa Guutuu",
-    usernameLabel: "Maqaa Fayyadamaa",
+    save: "Olkaa’i",
+    nameLabel: "Maqaa Guutuu",
+    phoneNumberLabel: "Lakkoofsa Bilbilaa",
     emailLabel: "Imeelii",
     farmNameLabel: "Maqaa Qonnaa",
-    locationLabel: "Bakka",
-    cropsLabel: "Mala Qonnaa (walitti qoodaman)",
+    regionLabel: "Naannoo",
+    zoneLabel: "Godina",
+    woredaLabel: "Aanaa",
   },
   ti: {
     title: "ገበራውያን",
     subtitle: "ገበራውያን ምሕደራ",
     id: "መታወቂያ",
-    fullName: "ምሉእ ስም",
-    username: "ስም ተጠቃሚ",
+    name: "ምሉእ ስም",
     email: "ኢመይል",
+    phoneNumber: "ቁፅሪ ስልኪ",
     farmName: "ስም ሕርሻ",
-    location: "ቦታ",
-    crops: "ዝራውቲ",
+    region: "ክልል",
+    zone: "ዞባ",
+    woreda: "ወረዳ",
     actions: "ተግባራት",
-    noCrops: "ዝራውቲ የለን",
     edit: "ምሕዳስ",
     delete: "ምስራይ",
     deleteSuccess: "ገበራዊ ብትኽክል ተሰሪዙ!",
@@ -120,25 +124,25 @@ const teamTranslations = {
     updateError: "ገበራዊ ምሕዳስ ኣይተኻእለን። በጃኹም ደጊምኩም ፈትኑ።",
     cancel: "ምስራይ",
     save: "ምዝገባ",
-    fullNameLabel: "ምሉእ ስም",
-    usernameLabel: "ስም ተጠቃሚ",
+    nameLabel: "ምሉእ ስም",
+    phoneNumberLabel: "ቁፅሪ ስልኪ",
     emailLabel: "ኢመይል",
     farmNameLabel: "ስም ሕርሻ",
-    locationLabel: "ቦታ",
-    cropsLabel: "ዝራውቲ (ብነጠላ ሰረዝ ዝተፈላለዩ)",
+    regionLabel: "ክልል",
+    zoneLabel: "ዞባ",
+    woredaLabel: "ወረዳ",
   },
 };
 
-// Edit Farmer Modal Component
 const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
   const [formData, setFormData] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    farmName: "",
-    location: "",
-    crops: [],
-    ...farmer, // Spread the farmer object to override defaults
+    name: farmer?.name || "",
+    email: farmer?.email || "",
+    phoneNumber: farmer?.phoneNumber || "",
+    region: farmer?.location?.region || "",
+    zone: farmer?.location?.zone || "",
+    woreda: farmer?.location?.woreda || "",
+    _id: farmer?._id,
   });
 
   const handleChange = (e) => {
@@ -148,7 +152,19 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    const updatedData = {
+      ...formData,
+      location: {
+        region: formData.region,
+        zone: formData.zone,
+        woreda: formData.woreda,
+      },
+    };
+    delete updatedData.region;
+    delete updatedData.zone;
+    delete updatedData.woreda;
+
+    onSave(updatedData);
     onClose();
   };
 
@@ -169,17 +185,9 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label={teamTranslations[language].fullNameLabel}
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label={teamTranslations[language].usernameLabel}
-            name="username"
-            value={formData.username}
+            label={teamTranslations[language].nameLabel}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
             margin="normal"
           />
@@ -193,29 +201,34 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
           />
           <TextField
             fullWidth
-            label={teamTranslations[language].farmNameLabel}
-            name="farmName"
-            value={formData.farmName}
+            label={teamTranslations[language].phoneNumberLabel}
+            name="phoneNumber"
+            value={formData.phoneNumber}
             onChange={handleChange}
             margin="normal"
           />
           <TextField
             fullWidth
-            label={teamTranslations[language].locationLabel}
-            name="location"
-            value={formData.location}
+            label={teamTranslations[language].regionLabel}
+            name="region"
+            value={formData.region}
             onChange={handleChange}
             margin="normal"
           />
           <TextField
             fullWidth
-            label={teamTranslations[language].cropsLabel}
-            name="crops"
-            value={formData.crops?.join(", ")} // Convert array to comma-separated string
-            onChange={
-              (e) =>
-                setFormData({ ...formData, crops: e.target.value.split(", ") }) // Convert string back to array
-            }
+            label={teamTranslations[language].zoneLabel}
+            name="zone"
+            value={formData.zone}
+            onChange={handleChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label={teamTranslations[language].woredaLabel}
+            name="woreda"
+            value={formData.woreda}
+            onChange={handleChange}
             margin="normal"
           />
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
@@ -238,7 +251,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
 };
 
 // Main Component
-const Team = () => {
+const Farmers = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [farmers, setFarmers] = useState([]);
@@ -246,7 +259,6 @@ const Team = () => {
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const { language } = useLanguage();
 
-  // Fetch farmer data from the backend
   useEffect(() => {
     const fetchFarmers = async () => {
       try {
@@ -258,50 +270,39 @@ const Team = () => {
           }
         );
 
-        // Normalize the data: Ensure every farmer has a `crops` field
-        const normalizedFarmers = response.data.map((farmer) => ({
+        console.log(response.data);
+        // Ensure each row has a location object
+        const farmersWithLocation = response.data.map((farmer) => ({
           ...farmer,
-          crops: farmer.crops || [], // Default to an empty array if `crops` is missing
+          location: farmer.location || {}, // fallback to empty object if missing
         }));
-
-        console.log("Normalized farmers data:", normalizedFarmers);
-        setFarmers(normalizedFarmers);
+        setFarmers(farmersWithLocation);
       } catch (error) {
         console.error("Error fetching farmers:", error);
-        if (error.response) {
-          console.error("Error details:", error.response.data);
-        }
       }
     };
-
     fetchFarmers();
   }, []);
 
-  // Handle delete farmer
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/farmers/farmers/${id}`, {
+      await axios.delete(`http://localhost:5000/api/users/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFarmers(farmers.filter((farmer) => farmer._id !== id));
       toast.success(teamTranslations[language].deleteSuccess);
     } catch (error) {
       console.error("Error deleting farmer:", error);
-      if (error.response) {
-        console.error("Error details:", error.response.data);
-      }
       toast.error(teamTranslations[language].deleteError);
     }
   };
 
-  // Handle edit farmer
   const handleEdit = (farmer) => {
     setSelectedFarmer(farmer);
     setEditModalOpen(true);
   };
 
-  // Handle save edited farmer
   const handleSave = async (updatedFarmer) => {
     try {
       const token = localStorage.getItem("token");
@@ -313,36 +314,25 @@ const Team = () => {
         }
       );
 
-      // Update the farmers list with the updated farmer
       setFarmers((prevFarmers) =>
         prevFarmers.map((farmer) =>
           farmer._id === updatedFarmer._id ? response.data.farmer : farmer
         )
       );
-
       toast.success(teamTranslations[language].updateSuccess);
     } catch (error) {
       console.error("Error updating farmer:", error);
-      if (error.response) {
-        console.error("Error details:", error.response.data);
-      }
       toast.error(teamTranslations[language].updateError);
     }
   };
 
-  // Define columns for the DataGrid
   const columns = [
     { field: "_id", headerName: teamTranslations[language].id, flex: 1 },
     {
-      field: "fullName",
-      headerName: teamTranslations[language].fullName,
+      field: "name",
+      headerName: teamTranslations[language].name,
       flex: 1,
       cellClassName: "name-column--cell",
-    },
-    {
-      field: "username",
-      headerName: teamTranslations[language].username,
-      flex: 1,
     },
     {
       field: "email",
@@ -350,24 +340,29 @@ const Team = () => {
       flex: 1,
     },
     {
-      field: "farmName",
-      headerName: teamTranslations[language].farmName,
+      field: "phoneNumber",
+      headerName: teamTranslations[language].phoneNumber,
       flex: 1,
     },
     {
-      field: "location",
-      headerName: teamTranslations[language].location,
+      field: "region",
+      headerName: teamTranslations[language].region,
       flex: 1,
+      valueGetter: (params) => params?.row?.location?.region || "",
     },
     {
-      field: "crops",
-      headerName: teamTranslations[language].crops,
+      field: "zone",
+      headerName: teamTranslations[language].zone,
       flex: 1,
-      valueGetter: (params) => {
-        const crops = params.row?.crops || [];
-        return crops.join(", ") || teamTranslations[language].noCrops;
-      },
+      valueGetter: (params) => params?.row?.location?.zone || "",
     },
+    {
+      field: "woreda",
+      headerName: teamTranslations[language].woreda,
+      flex: 1,
+      valueGetter: (params) => params?.row?.location?.woreda || "",
+    },
+    // ... rest of your columns
     {
       field: "actions",
       headerName: teamTranslations[language].actions,
@@ -383,7 +378,7 @@ const Team = () => {
           </IconButton>
 
           <IconButton
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => handleDelete(params.row?._id)} // Improved check
             sx={{ color: colors.redAccent[500] }}
             title={teamTranslations[language].delete}
           >
@@ -396,17 +391,7 @@ const Team = () => {
 
   return (
     <Box m="20px">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer />
       <Header
         title={teamTranslations[language].title}
         subtitle={teamTranslations[language].subtitle}
@@ -415,15 +400,9 @@ const Team = () => {
         m="40px 0 0 0"
         height="75vh"
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
+          "& .MuiDataGrid-root": { border: "none" },
+          "& .MuiDataGrid-cell": { borderBottom: "none" },
+          "& .name-column--cell": { color: colors.greenAccent[300] },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
@@ -464,4 +443,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default Farmers;

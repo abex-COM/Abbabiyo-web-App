@@ -9,9 +9,11 @@ const {
   registerSuperAdmin,
   getAdminById,
   getAdmins,
+  getDashboardData,
 } = require("../controllers/adminController");
 const upload = require("../middleware/upload");
 const authController = require("../controllers/authController");
+const { getFramersPerRegion } = require("../controllers/userController");
 
 // Existing routes...
 router.post("/login", authController.login);
@@ -28,7 +30,7 @@ router.put("/update/:id", roleMiddleware("superadmin"), updateAdmin);
 router.delete("/delete/:id", roleMiddleware("superadmin"), deleteAdmin);
 // for developmen only
 router.post("/register-superadmin", registerSuperAdmin);
-
+router.get("/dashboard-data", roleMiddleware("superadmin"), getDashboardData);
 // New route for updating profile
 router.put(
   "/update-profile/:id",
@@ -37,5 +39,6 @@ router.put(
 );
 // New route for fetching a single admin by ID (only Super Admin can access)
 router.get("/get-admin/:id", getAdminById);
+router.get("/farmers-per-region", getFramersPerRegion);
 
 module.exports = router;

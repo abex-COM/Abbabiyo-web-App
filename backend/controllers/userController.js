@@ -95,7 +95,7 @@ exports.updateUser = async (req, res) => {
       .json({ message: "Failed to update profile.", error: err.message });
   }
 };
-exports.deleteUser = async (req, res) => {
+exports.deleteUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -114,5 +114,30 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+// In your Express server
+exports.getFramersPerRegion = async (req, res) => {
+  try {
+    const result = await User.aggregate([
+      { $match: { role: "farmer" } },
+      {
+        $group: {
+          _id: "$location.region",
+          farmerCount: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          region: "$_id",
+          Farmers: "$farmerCount",
+        },
+      },
+    ]);
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get data" });
   }
 };

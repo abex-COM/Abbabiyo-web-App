@@ -32,7 +32,7 @@ const sidebarTranslations = {
     LineChart: "Line Chart",
     GeographyChart: "Geography Chart",
     Admins: "Admins",
-    Team: "Team",
+    Team: "Farmers", // Change "Team" to "Farmers"
     CreateAdmin: "Create Admin",
     Data: "Data",
     Pages: "Pages",
@@ -53,7 +53,7 @@ const sidebarTranslations = {
     LineChart: "መስመር ገበታ",
     GeographyChart: "ጂኦግራፊ ገበታ",
     Admins: "አስተዳዳሪዎች",
-    Team: "ቡድን",
+    Team: "ሐበሬታ", // Update translation if needed for "Farmers"
     CreateAdmin: "አስተዳዳሪ ፍጠር",
     Data: "ዳታ",
     Pages: "ገጾች",
@@ -74,7 +74,7 @@ const sidebarTranslations = {
     LineChart: "Layin Chaartii",
     GeographyChart: "Jiyoogiraafii Chaartii",
     Admins: "Bulchaa",
-    Team: "Garee",
+    Team: "Fira", // Update translation for "Farmers"
     CreateAdmin: "Manaajii Uumu",
     Data: "Daataa",
     Pages: "Fuulli",
@@ -95,7 +95,7 @@ const sidebarTranslations = {
     LineChart: "መስመር ገበታ",
     GeographyChart: "ጂኦግራፊ ገበታ",
     Admins: "ኣስተዳደርቲ",
-    Team: "ቡድን",
+    Team: "ቡድን", // Change "Team" to "Farmers"
     CreateAdmin: "ኣስተዳደርቲ ምፍጣር",
     Data: "ዳታ",
     Pages: "ገጻት",
@@ -435,7 +435,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               />
             </SubMenu>
 
-            <Item
+            {/* <Item
               title="ContactsInformation"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
@@ -450,7 +450,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setSelected={setSelected}
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
+            /> */}
 
             {/* PAGES SECTION */}
             <Typography
@@ -460,22 +460,22 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               {sidebarTranslations[language].Pages}
             </Typography>
-            <Item
+            {/* <Item
               title="Calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
-            <Item
+            /> */}
+            {/* <Item
               title="FAQPage"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
+            /> */}
             {/* CHARTS SECTION */}
             <Typography
               variant="h6"
@@ -500,22 +500,22 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
-            <Item
+            {/* <Item
               title="LineChart"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
-            <Item
+            /> */}
+            {/* <Item
               title="GeographyChart"
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

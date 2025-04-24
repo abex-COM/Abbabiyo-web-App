@@ -5,10 +5,15 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { MenuItem, FormControl, InputLabel, Select } from "@mui/material";
+
 import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
-
-// Translation dictionary
+import ethiopianRegions, {
+  ethiopianWoredas,
+  ethiopianZones,
+} from "./../../../../constants/ethiopianData";
+import { useState } from "react";
 const farmerTranslations = {
   en: {
     title: "CREATE FARMER",
@@ -19,7 +24,7 @@ const farmerTranslations = {
     region: "Region",
     zone: "Zone",
     woreda: "Woreda",
-    createButton: "Create New Farmer",
+    createButton: "Register",
     success: "Farmer created successfully!",
     error: "Failed to create farmer. Please try again.",
     validation: {
@@ -102,8 +107,15 @@ const farmerTranslations = {
 };
 
 const Form = () => {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
+  // const isNonMobile = useMediaQuery("(min-width:600px)");
   const { language } = useLanguage();
+
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedZone, setSelectedZone] = useState("");
+
+  const regions = ethiopianRegions;
+  const zones = selectedRegion ? ethiopianZones[selectedRegion] || [] : [];
+  const woredas = selectedZone ? ethiopianWoredas[selectedZone] || [] : [];
 
   const handleFormSubmit = async (values, { resetForm }) => {
     try {
@@ -111,7 +123,7 @@ const Form = () => {
         name: values.name,
         phoneNumber: values.phoneNumber,
         password: values.password,
-        profilePicture: "", // Not used in form currently
+        profilePicture: "",
         location: {
           region: values.region,
           zone: values.zone,
@@ -124,37 +136,44 @@ const Form = () => {
         dataToSend
       );
 
-      console.log("Farmer created:", response.data.newUser);
       toast.success(farmerTranslations[language].success);
       resetForm();
+      setSelectedRegion("");
+      setSelectedZone("");
     } catch (error) {
-      console.error(
-        "Error creating farmer:",
-        error.response?.data || error.message
+      toast.error(
+        error.response?.data?.message || farmerTranslations[language].error
       );
-      toast.error(error.response?.data?.message || "An error occurred");
-      resetForm();
     }
   };
 
   const validationSchema = yup.object().shape({
-    name: yup.string().required("Name is required"),
+    name: yup
+      .string()
+      .required(farmerTranslations[language].validation.nameRequired),
     phoneNumber: yup
       .string()
-      .required("Phone number is required")
+      .required(farmerTranslations[language].validation.phoneNumberRequired)
       .matches(
         /^(0\d{9}|\+251\d{9})$/,
         "Phone number must start with 0 or +251 and have 9 digits after"
       ),
-
-    password: yup.string().required("Password is required"),
+    password: yup
+      .string()
+      .required(farmerTranslations[language].validation.passwordRequired),
     confirmPassword: yup
       .string()
       .oneOf([yup.ref("password"), null], "Passwords must match")
       .required("Confirm Password is required"),
-    region: yup.string().required("Region is required"),
-    zone: yup.string().required("Zone is required"),
-    woreda: yup.string().required("Woreda is required"),
+    region: yup
+      .string()
+      .required(farmerTranslations[language].validation.regionRequired),
+    zone: yup
+      .string()
+      .required(farmerTranslations[language].validation.zoneRequired),
+    woreda: yup
+      .string()
+      .required(farmerTranslations[language].validation.woredaRequired),
   });
 
   const initialValues = {
@@ -168,7 +187,7 @@ const Form = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box m="20px" height="1000px">
       <ToastContainer />
       <Header
         title={farmerTranslations[language].title}
@@ -177,16 +196,17 @@ const Form = () => {
 
       <Formik
         initialValues={initialValues}
-        onSubmit={handleFormSubmit}
         validationSchema={validationSchema}
+        onSubmit={handleFormSubmit}
       >
         {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
           values,
           errors,
           touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
             <TextField
@@ -243,50 +263,73 @@ const Form = () => {
               margin="normal"
             />
 
-            <TextField
-              fullWidth
-              variant="outlined"
-              label={farmerTranslations[language].region}
-              name="region"
-              onChange={handleChange}
-              onBlur={handleBlur}
-              value={values.region}
-              error={touched.region && Boolean(errors.region)}
-              helperText={touched.region && errors.region}
-              margin="normal"
-            />
+            {/* Region Dropdown */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel>{farmerTranslations[language].region}</InputLabel>
+              <Select
+                name="region"
+                value={values.region}
+                onChange={(e) => {
+                  const selected = e.target.value;
+                  setFieldValue("region", selected);
+                  setSelectedRegion(selected);
+                  setSelectedZone("");
+                  setFieldValue("zone", "");
+                  setFieldValue("woreda", "");
+                }}
+              >
+                {regions.map((region) => (
+                  <MenuItem key={region.value} value={region.value}>
+                    {region.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Zone"
-              name="zone"
-              onChange={handleChange}
-              onBlur={handleBlur}
-              value={values.zone}
-              error={touched.zone && Boolean(errors.zone)}
-              helperText={touched.zone && errors.zone}
-              margin="normal"
-            />
+            {/* Zone Dropdown */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel>{farmerTranslations[language].zone}</InputLabel>
+              <Select
+                name="zone"
+                value={values.zone}
+                onChange={(e) => {
+                  const selected = e.target.value;
+                  setFieldValue("zone", selected);
+                  setSelectedZone(selected);
+                  setFieldValue("woreda", "");
+                }}
+                disabled={!selectedRegion}
+              >
+                {zones.map((zone) => (
+                  <MenuItem key={zone.value} value={zone.value}>
+                    {zone.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Woreda"
-              name="woreda"
-              onChange={handleChange}
-              onBlur={handleBlur}
-              value={values.woreda}
-              error={touched.woreda && Boolean(errors.woreda)}
-              helperText={touched.woreda && errors.woreda}
-              margin="normal"
-            />
+            {/* Woreda Dropdown */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel>{farmerTranslations[language].woreda}</InputLabel>
+              <Select
+                name="woreda"
+                value={values.woreda}
+                onChange={handleChange}
+                disabled={!selectedZone}
+              >
+                {woredas.map((woreda) => (
+                  <MenuItem key={woreda.value} value={woreda.value}>
+                    {woreda.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <Button
               type="submit"
               variant="contained"
-              color="primary"
-              sx={{ mt: 2 }}
+              color="secondary"
+              sx={{ mt: 2, width: "300px" }}
             >
               {farmerTranslations[language].createButton}
             </Button>

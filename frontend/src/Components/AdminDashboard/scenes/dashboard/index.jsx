@@ -13,6 +13,8 @@ import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
 import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 // Translation dictionary for the Dashboard
 const dashboardTranslations = {
@@ -26,8 +28,8 @@ const dashboardTranslations = {
     trafficReceived: "Traffic Received",
     revenueGenerated: "Revenue Generated",
     recentTransactions: "Recent Transactions",
-    campaign: "Campaign",
-    salesQuantity: "Sales Quantity",
+    campaign: "Total Registered Farmers", // updated
+    salesQuantity: "Farmers By Zone",
     geographyBasedTraffic: "Geography Based Traffic",
     revenueGeneratedText: "$48,352 revenue generated",
     includesExtraCosts: "Includes extra misc expenditures and costs",
@@ -42,8 +44,8 @@ const dashboardTranslations = {
     trafficReceived: "የተቀበለ ትራፊክ",
     revenueGenerated: "የሚገኝ ገቢ",
     recentTransactions: "የቅርብ ጊዜ ግብይቶች",
-    campaign: "ዘመቻ",
-    salesQuantity: "የሽያጭ ብዛት",
+    campaign: "የተመዘገቡ ገበሬዎች ጠቅላላ ብዛት", // updated
+    salesQuantity: "የክልል ያነፈ ገበሬዎች",
     geographyBasedTraffic: "በጂኦግራፊ ላይ የተመሰረተ ትራፊክ",
     revenueGeneratedText: "$48,352 ገቢ ተፈጥሯል",
     includesExtraCosts: "ተጨማሪ ወጪዎችን ያጠቃልላል",
@@ -58,8 +60,8 @@ const dashboardTranslations = {
     trafficReceived: "Traafiifi qabadame",
     revenueGenerated: "Mallaqa argame",
     recentTransactions: "Gareen walqabsiisaa",
-    campaign: "Kaampaanii",
-    salesQuantity: "Gatii gurguramaa",
+    campaign: "Baay'ina Guutuu Faarmerootaa", // updated
+    salesQuantity: "Faarmeroota Naannoo",
     geographyBasedTraffic: "Traafiifi geografii irratti hundaa’e",
     revenueGeneratedText: "$48,352 mallaqa argame",
     includesExtraCosts: "Kostii dabalataa ni hammata",
@@ -70,12 +72,12 @@ const dashboardTranslations = {
     downloadReports: "ሪፖርት ምውራድ",
     emailsSent: "ኢሜል ተልኪኡ",
     salesObtained: "ዝተገዝአ ሽያጭ",
-    newClients: "ሓደስቲ �ላዕለይ",
+    newClients: "ሓደስቲ ላዕለይ",
     trafficReceived: "ትራፊክ ተቐቢሉ",
     revenueGenerated: "ገቢ ተፈጢሩ",
     recentTransactions: "ቀረባ ግብይት",
-    campaign: "ካምፓን",
-    salesQuantity: "ብዝሒ ሽያጭ",
+    campaign: "ድምሩ ዝተመዝገቡ ኣራሒታት", // updated
+    salesQuantity: "ብዝሒ ኣራሒታት ናይ ዞባ",
     geographyBasedTraffic: "ትራፊክ ኣብ ጂኦግራፊ ዝተመስረተ",
     revenueGeneratedText: "$48,352 ገቢ ተፈጢሩ",
     includesExtraCosts: "ወጻኢታት የሕልና ወጪ የሚያካትት",
@@ -83,10 +85,46 @@ const dashboardTranslations = {
 };
 
 const Dashboard = () => {
+  const [dashboardData, setDashboardData] = useState(0);
+  const [data, setData] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { language } = useLanguage(); // Get the current language
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const fetchDashboardData = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/admin/dashboard-data",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setDashboardData(res.data);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      }
+    };
 
+    fetchDashboardData();
+  }, []);
+  useEffect(() => {
+    const fetchFarmers = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/admin/farmers-per-region"
+        );
+        setData(res.data);
+      } catch (err) {
+        console.error("Failed to load farmer stats", err);
+      }
+    };
+
+    fetchFarmers();
+  }, []);
+  console.log(dashboardData);
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -118,223 +156,12 @@ const Dashboard = () => {
 
       {/* GRID & CHARTS */}
       <Box
-        display="grid"
+        display="flex"
         gridTemplateColumns="repeat(12, 1fr)"
         gridAutoRows="140px"
+        justifyContent="space-around"
         gap="20px"
       >
-        {/* ROW 1 */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          <StatBox
-            title="12,361"
-            subtitle={dashboardTranslations[language].emailsSent}
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          <StatBox
-            title="431,225"
-            subtitle={dashboardTranslations[language].salesObtained}
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          <StatBox
-            title="32,441"
-            subtitle={dashboardTranslations[language].newClients}
-            progress="0.30"
-            increase="+5%"
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle={dashboardTranslations[language].trafficReceived}
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-
-        {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.02)",
-            },
-          }}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                {dashboardTranslations[language].revenueGenerated}
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                $59,342.32
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.02)",
-            },
-          }}
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
-          >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              {dashboardTranslations[language].recentTransactions}
-            </Typography>
-          </Box>
-          {mockTransactions.map((transaction, i) => (
-            <Box
-              key={`${transaction.txId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={colors.greenAccent[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                  {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {transaction.user}
-                </Typography>
-              </Box>
-              <Box color={colors.grey[100]}>{transaction.date}</Box>
-              <Box
-                backgroundColor={colors.greenAccent[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                ${transaction.cost}
-              </Box>
-            </Box>
-          ))}
-        </Box>
-
         {/* ROW 3 */}
         <Box
           gridColumn="span 4"
@@ -358,8 +185,19 @@ const Dashboard = () => {
             alignItems="center"
             mt="25px"
           >
-            <ProgressCircle size="125" />
+            <ProgressCircle
+              progress={(dashboardData?.totalFarmers || 0) / 100}
+              size="125"
+            />
             <Typography
+              variant="h5"
+              color={colors.greenAccent[500]}
+              sx={{ mt: "15px" }}
+            >
+              {dashboardData?.totalFarmers || 0} farmers
+            </Typography>
+
+            {/* <Typography
               variant="h5"
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
@@ -368,7 +206,7 @@ const Dashboard = () => {
             </Typography>
             <Typography>
               {dashboardTranslations[language].includesExtraCosts}
-            </Typography>
+            </Typography> */}
           </Box>
         </Box>
         <Box
@@ -390,32 +228,8 @@ const Dashboard = () => {
           >
             {dashboardTranslations[language].salesQuantity}
           </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          padding="30px"
-          sx={{
-            borderRadius: "5px",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.02)",
-            },
-          }}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ marginBottom: "15px" }}
-          >
-            {dashboardTranslations[language].geographyBasedTraffic}
-          </Typography>
-          <Box height="200px">
-            <GeographyChart isDashboard={true} />
+          <Box height="250px" width="700px" mt="-20px">
+            <BarChart data={data} isDashboard={true} />
           </Box>
         </Box>
       </Box>

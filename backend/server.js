@@ -24,9 +24,11 @@ connectDB();
 
 // Routes
 // app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes); // ✅ Updated route path
+app.use("/api/users", userRoutes); //  Updated route path
 app.use("/api/admin", adminRoutes);
-
+app.all("*", (req, res) => {
+  res.status(404).json({ message: `Route  ${req.originalUrl} not found` });
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
