@@ -2,58 +2,48 @@ import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { Box } from "@mui/material"; // Box from MUI
+import useUserData from "./../../../hooks/useUserData";
 
 const BarChart = ({ data = [], isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const user = useUserData();
+  let formattedData = [];
 
-  // Ensure the data format is correct
-  const formattedData = data.map((item) => ({
-    region: item.region, // The name of the region
-    farmers: item.Farmers, // Number of farmers in that region
-  }));
+  if (user?.role === "superadmin") {
+    formattedData = data.map((item) => ({
+      region: item.region, // superadmin data uses "region"
+      farmers: item.Farmers,
+    }));
+  } else if (user?.role === "admin") {
+    formattedData = data.map((item) => ({
+      region: item.woreda, // admin data uses "woreda", but map it to "region"
+      farmers: item.Farmers,
+    }));
+  }
 
-  // Adding a fallback when data is empty to prevent collapsing
-  if (formattedData.length === 0) {
+  // Fallback for safety
+  if (!formattedData || formattedData.length === 0) {
     return <div>No data available for the chart</div>;
   }
 
   return (
     <Box height="100%" width="100%">
-      {" "}
-      {/* Ensure the container fills available space */}
       <ResponsiveBar
         data={formattedData}
+        keys={["farmers"]}
+        indexBy="region" // Always use "region" as index
         theme={{
           axis: {
-            domain: {
-              line: {
-                stroke: colors.grey[100],
-              },
-            },
-            legend: {
-              text: {
-                fill: colors.grey[100],
-              },
-            },
+            domain: { line: { stroke: colors.grey[100] } },
+            legend: { text: { fill: colors.grey[100] } },
             ticks: {
-              line: {
-                stroke: colors.grey[100],
-                strokeWidth: 1,
-              },
-              text: {
-                fill: colors.grey[100],
-              },
+              line: { stroke: colors.grey[100], strokeWidth: 1 },
+              text: { fill: colors.grey[100] },
             },
           },
-          legends: {
-            text: {
-              fill: colors.grey[100],
-            },
-          },
+          legends: { text: { fill: colors.grey[100] } },
         }}
-        keys={["farmers"]} // Using 'farmers' as the key for count
-        indexBy="region" // Index by region (X-axis)
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
         valueScale={{ type: "linear" }}
@@ -89,7 +79,7 @@ const BarChart = ({ data = [], isDashboard = false }) => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: isDashboard ? undefined : "Region",
+          legend: isDashboard ? undefined : "Region/Woreda",
           legendPosition: "middle",
           legendOffset: 32,
         }}
@@ -102,46 +92,24 @@ const BarChart = ({ data = [], isDashboard = false }) => {
           legendOffset: -40,
         }}
         enableLabel={false}
-        labelSkipWidth={12}
-        labelSkipHeight={12}
-        labelTextColor={{
-          from: "color",
-          modifiers: [["darker", 1.6]],
-        }}
         legends={[
           {
             dataFrom: "keys",
             anchor: "bottom-right",
             direction: "column",
-            justify: false,
             translateX: 120,
             translateY: 0,
             itemsSpacing: 2,
             itemWidth: 100,
             itemHeight: 20,
-            itemDirection: "left-to-right",
-            itemOpacity: 0.85,
             symbolSize: 20,
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemOpacity: 1,
-                },
-              },
-            ],
+            effects: [{ on: "hover", style: { itemOpacity: 1 } }],
           },
         ]}
         role="application"
-        barAriaLabel={function (e) {
-          return (
-            e.id +
-            ": " +
-            e.formattedValue +
-            " farmers in region: " +
-            e.indexValue
-          );
-        }}
+        barAriaLabel={(e) =>
+          `${e.id}: ${e.formattedValue} farmers in region: ${e.indexValue}`
+        }
       />
     </Box>
   );

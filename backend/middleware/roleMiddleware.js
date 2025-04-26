@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
-const roleMiddleware = (requiredRole) => (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the Authorization header
+
+const roleMiddleware = (requiredRoles) => (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res
@@ -9,12 +10,12 @@ const roleMiddleware = (requiredRole) => (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Decode the token
-    const userRole = decoded.role; // Extract the role from the decoded token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userRole = decoded.role;
 
-    if (userRole === requiredRole || userRole === "superadmin") {
-      req.user = decoded; // Attach the decoded user to the request object
-      next(); // Allow access
+    if (requiredRoles.includes(userRole)) {
+      req.user = decoded;
+      next();
     } else {
       res
         .status(403)

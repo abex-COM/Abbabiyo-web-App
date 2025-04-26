@@ -13,13 +13,13 @@ const {
 } = require("../controllers/adminController");
 const upload = require("../middleware/upload");
 const authController = require("../controllers/authController");
-const { getFramersPerRegion } = require("../controllers/userController");
+const { getFramersperZone } = require("../controllers/userController");
 
 // Existing routes...
 router.post("/login", authController.login);
 
 // Fetch all admins (only Super Admin can access)
-router.get("/get-all-admin", getAdmins);
+router.get("/get-all-admin", roleMiddleware("superadmin"), getAdmins);
 // Create an admin (only Super Admin)
 router.post("/create", roleMiddleware("superadmin"), createAdmin);
 
@@ -30,7 +30,7 @@ router.put("/update/:id", roleMiddleware("superadmin"), updateAdmin);
 router.delete("/delete/:id", roleMiddleware("superadmin"), deleteAdmin);
 // for developmen only
 router.post("/register-superadmin", registerSuperAdmin);
-router.get("/dashboard-data", roleMiddleware("superadmin"), getDashboardData);
+router.get("/dashboard-data", getDashboardData);
 // New route for updating profile
 router.put(
   "/update-profile/:id",
@@ -39,6 +39,10 @@ router.put(
 );
 // New route for fetching a single admin by ID (only Super Admin can access)
 router.get("/get-admin/:id", getAdminById);
-router.get("/farmers-per-region", getFramersPerRegion);
+router.get(
+  "/farmers-per-region",
+  roleMiddleware(["admin", "superadmin"]),
+  getFramersperZone
+);
 
 module.exports = router;

@@ -420,7 +420,7 @@ const checkoutSchema = yup.object().shape({
     .matches(/^[A-Za-z\s]+$/, "invalid"),
   username: yup.string().required("required"),
   email: yup.string().email("invalid").required("required"),
-  password: yup.string().min(6, "too short"),
+  password: yup.string().min(4, "too short"),
   confirmPassword: yup.string().oneOf([yup.ref("password"), null], "mismatch"),
 });
 

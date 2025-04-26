@@ -50,7 +50,7 @@ const login = async (req, res) => {
     await admin.save();
 
     const token = jwt.sign(
-      { id: admin._id, role: admin.role },
+      { id: admin._id, role: admin.role, zone: admin.zone },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );

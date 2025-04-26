@@ -1,9 +1,7 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { connectDB } = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/UserRoutes"); // ✅ Renamed
 const adminRoutes = require("./routes/adminRoutes");
 

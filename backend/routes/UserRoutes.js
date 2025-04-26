@@ -7,13 +7,14 @@ const {
   registerUser,
   deleteUserById,
 } = require("../controllers/userController");
+const roleMiddleware = require("../middleware/roleMiddleware");
 // Existing routes...
 
 // Register a new user
 router.post("/register", registerUser);
 
 // Fetch all users
-router.get("/get-all-users", getAllUsers);
+router.get("/get-all-users", roleMiddleware("admin"), getAllUsers);
 
 // Fetch a single user by ID
 router.get("/get-a-user/:id", getUserById);

@@ -137,7 +137,6 @@ export const teamTranslations = {
 const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
   const [formData, setFormData] = useState({
     name: farmer?.name || "",
-    email: farmer?.email || "",
     phoneNumber: farmer?.phoneNumber || "",
     region: farmer?.location?.region || "",
     zone: farmer?.location?.zone || "",
@@ -191,14 +190,7 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
             onChange={handleChange}
             margin="normal"
           />
-          <TextField
-            fullWidth
-            label={teamTranslations[language].emailLabel}
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            margin="normal"
-          />
+
           <TextField
             fullWidth
             label={teamTranslations[language].phoneNumberLabel}
@@ -250,7 +242,6 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
   );
 };
 
-// Main Component
 const Farmers = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -260,9 +251,10 @@ const Farmers = () => {
   const { language } = useLanguage();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
     const fetchFarmers = async () => {
       try {
-        const token = localStorage.getItem("token");
         const response = await axios.get(
           "http://localhost:5000/api/users/get-all-users",
           {
@@ -270,13 +262,17 @@ const Farmers = () => {
           }
         );
 
-        console.log(response.data);
-        // Ensure each row has a location object
-        const farmersWithLocation = response.data.map((farmer) => ({
+        const data = response.data || [];
+
+        // Preprocess and flatten the data
+        const processedFarmers = data.map((farmer) => ({
           ...farmer,
-          location: farmer.location || {}, // fallback to empty object if missing
+          region: farmer?.location?.region || "", // Add region field directly to the farmer object
+          zone: farmer?.location?.zone || "", // Add zone field directly to the farmer object
+          woreda: farmer?.location?.woreda || "", // Add woreda field directly to the farmer object
         }));
-        setFarmers(farmersWithLocation);
+
+        setFarmers(processedFarmers);
       } catch (error) {
         console.error("Error fetching farmers:", error);
       }
@@ -334,11 +330,7 @@ const Farmers = () => {
       flex: 1,
       cellClassName: "name-column--cell",
     },
-    {
-      field: "email",
-      headerName: teamTranslations[language].email,
-      flex: 1,
-    },
+
     {
       field: "phoneNumber",
       headerName: teamTranslations[language].phoneNumber,
@@ -346,23 +338,19 @@ const Farmers = () => {
     },
     {
       field: "region",
-      headerName: teamTranslations[language].region,
+      headerName: "Region",
       flex: 1,
-      valueGetter: (params) => params?.row?.location?.region || "",
     },
     {
       field: "zone",
       headerName: teamTranslations[language].zone,
       flex: 1,
-      valueGetter: (params) => params?.row?.location?.zone || "",
     },
     {
       field: "woreda",
       headerName: teamTranslations[language].woreda,
       flex: 1,
-      valueGetter: (params) => params?.row?.location?.woreda || "",
     },
-    // ... rest of your columns
     {
       field: "actions",
       headerName: teamTranslations[language].actions,

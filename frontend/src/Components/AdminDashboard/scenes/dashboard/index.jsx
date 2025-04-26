@@ -86,13 +86,19 @@ const dashboardTranslations = {
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(0);
+  const token = localStorage.getItem("token");
   const [data, setData] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { language } = useLanguage(); // Get the current language
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const fetchDashboardData = async () => {
+      if (!token) {
+        console.error("No token found in local storage");
+        return;
+      }
+      // Check if the token is valid (optional, depending on your authentication flow)
+
       try {
         const res = await axios.get(
           "http://localhost:5000/api/admin/dashboard-data",
@@ -102,6 +108,8 @@ const Dashboard = () => {
             },
           }
         );
+        console.log(res.data);
+
         setDashboardData(res.data);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
@@ -109,12 +117,17 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [token]);
   useEffect(() => {
     const fetchFarmers = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/admin/farmers-per-region"
+          "http://localhost:5000/api/admin/farmers-per-region",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setData(res.data);
       } catch (err) {
@@ -123,8 +136,7 @@ const Dashboard = () => {
     };
 
     fetchFarmers();
-  }, []);
-  console.log(dashboardData);
+  }, [token]);
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -196,17 +208,6 @@ const Dashboard = () => {
             >
               {dashboardData?.totalFarmers || 0} farmers
             </Typography>
-
-            {/* <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              {dashboardTranslations[language].revenueGeneratedText}
-            </Typography>
-            <Typography>
-              {dashboardTranslations[language].includesExtraCosts}
-            </Typography> */}
           </Box>
         </Box>
         <Box

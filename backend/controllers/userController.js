@@ -42,6 +42,11 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
+    if (req.user.role === "admin") {
+      const user = await Farmer.find({ zone: req.user.zone, _id: id });
+      res.status(200).json({ user });
+    }
+
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -108,36 +113,88 @@ exports.deleteUserById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    res.status(200).json(users);
+    let users;
+
+    if (req.user.role === "admin") {
+      users = await User.find({ "location.zone": req.user.zone });
+    } else {
+      users = await User.find();
+    }
+
+    res.status(200).json(users); // directly send array
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 // In your Express server
-exports.getFramersPerRegion = async (req, res) => {
+exports.getFramersperZone = async (req, res) => {
   try {
-    const result = await User.aggregate([
-      { $match: { role: "farmer" } },
-      {
-        $group: {
-          _id: "$location.region",
-          farmerCount: { $sum: 1 },
+    let result;
+
+    if (req.user.role === "superadmin") {
+      result = await User.aggregate([
+        {
+          $group: {
+            _id: "$location.zone",
+            farmerCount: { $sum: 1 },
+          },
         },
-      },
-      {
-        $project: {
-          _id: 0,
-          region: "$_id",
-          Farmers: "$farmerCount",
+        {
+          $project: {
+            _id: 0,
+            region: "$_id",
+            Farmers: "$farmerCount",
+          },
         },
-      },
-    ]);
+      ]);
+    } else if (req.user.role === "admin") {
+      result = await User.aggregate([
+        {
+          $group: {
+            _id: "$location.woreda",
+            farmerCount: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            woreda: "$_id",
+            Farmers: "$farmerCount",
+          },
+        },
+      ]);
+    }
 
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to get data" });
   }
 };
+
+// exports.getFramersperWoreda = async (req, res) => {
+//   try {
+//     const result = await User.aggregate([
+//       {
+//         $group: {
+//           _id: "$location.woreda",
+//           farmerCount: { $sum: 1 },
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 0,
+//           woreda: "$_id",
+//           Farmers: "$farmerCount",
+//         },
+//       },
+//     ]);
+
+//     res.json(result);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to get data" });
+//   }
+// };

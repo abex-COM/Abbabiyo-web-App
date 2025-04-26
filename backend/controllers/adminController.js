@@ -7,7 +7,7 @@ const path = require("path");
 
 // Create an admin(non-super)
 const createAdmin = async (req, res) => {
-  const { fullName, username, email, password } = req.body;
+  const { fullName, username, email, password, zone } = req.body;
 
   try {
     const existingUser = await Admin.findOne({
@@ -20,15 +20,13 @@ const createAdmin = async (req, res) => {
         .json({ message: "Username or email already exists" });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
     const admin = new Admin({
       fullName,
       username,
       email,
-      password: hashedPassword,
+      password,
       role: "admin",
+      zone,
     });
 
     await admin.save();

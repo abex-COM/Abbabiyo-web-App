@@ -18,14 +18,15 @@ import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import axios from "axios";
 import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
 import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
-
+import useUserData from "./../../../../hooks/useUserData";
 // Translation dictionary for the sidebar
 const sidebarTranslations = {
   en: {
     Dashboard: "Dashboard",
     ContactsInformation: "Contacts Information",
     InvoicesBalances: "Invoices Balances",
-    CreateUser: "Create User",
+    CreateUser: "Register Farmer",
+    CreateFarmer: "Register",
     FAQPage: "FAQ Page",
     BarChart: "Bar Chart",
     PieChart: "Pie Chart",
@@ -33,7 +34,7 @@ const sidebarTranslations = {
     GeographyChart: "Geography Chart",
     Admins: "Admins",
     Team: "Farmers", // Change "Team" to "Farmers"
-    CreateAdmin: "Create Admin",
+    CreateAdmin: "Register Admin",
     Data: "Data",
     Pages: "Pages",
     Calendar: "Calendar",
@@ -46,7 +47,7 @@ const sidebarTranslations = {
     Dashboard: "ዳሽቦርድ",
     ContactsInformation: "የእውቂያ መረጃ",
     InvoicesBalances: "የክፍያ ሒሳቦች",
-    CreateUser: "ተጠቃሚ ፍጠር",
+    CreateUser: "ፍጠር",
     FAQPage: "ተደጋጋሚ ጥያቄዎች",
     BarChart: "ባር ገበታ",
     PieChart: "ፓይ ገበታ",
@@ -173,14 +174,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
-  const [user, setUser] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    profileImage: "default.png", // Default profile image
-    role: "", // Add role to the user state
-  });
-
+  // const [user, setUser] = useState({
+  //   fullName: "",
+  //   username: "",
+  //   email: "",
+  //   profileImage: "default.png", // Default profile image
+  //   role: "", // Add role to the user state
+  // });
+  const user = useUserData();
   // State to manage dropdown open/close
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
@@ -204,37 +205,33 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   };
 
   // Fetch user data on component mount
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) return;
 
-      const userId = JSON.parse(atob(token.split(".")[1])).id; // Extract user ID from JWT
+  //     const userId = JSON.parse(atob(token.split(".")[1])).id; // Extract user ID from JWT
 
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/admin/get-admin/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:5000/api/admin/get-admin/${userId}`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       console.log(response.data);
 
-        // Update state with user data
-        setUser(response.data.admin);
-        // Log the image path for debugging
-        console.log(
-          "Image Path:",
-          response.data.user?.profileImage
-            ? `/uploads/${response.data.user.profileImage}`
-            : defaultProfilePic
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  //       // Update state with user data
+  //       setUser(response.data.admin);
 
-    fetchUserData();
-  }, []);
+  //       // Log the image path for debugging
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, []);
 
   const { language } = useLanguage(); // Get the current language
 
@@ -283,9 +280,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  {sidebarTranslations[language].Admin}
-                </Typography>
                 <IconButton
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   sx={{ zIndex: 1000 }} // Set z-index for the toggle button
@@ -314,8 +308,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             mb={isCollapsed ? "0px" : "25px"} // Adjust margin when collapsed
           >
             <Box
-              width="100px"
-              height="100px"
+              width="200px"
+              height="200px"
               borderRadius="50%"
               overflow="hidden"
               border={`2px solid ${colors.greenAccent[500]}`}
@@ -353,6 +347,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                     ? sidebarTranslations[language].SuperAdmin
                     : sidebarTranslations[language].Admin}
                 </Typography>
+                <Typography variant="h4" color={colors.grey[100]}>
+                  {user?.zone} Zone Admin
+                </Typography>
               </Box>
             )}
           </Box>
@@ -379,7 +376,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             </Typography>
             {/* Create Dropdown */}
             <SubMenu
-              title={sidebarTranslations[language].CreateUser}
+              title={sidebarTranslations[language].CreateFarmer}
               icon={<PersonOutlinedIcon />}
               open={isCreateOpen}
               onOpenChange={handleCreateOpen} // Use handleCreateOpen to manage dropdown state
@@ -435,23 +432,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               />
             </SubMenu>
 
-            {/* <Item
-              title="ContactsInformation"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
-            <Item
-              title="InvoicesBalances"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            /> */}
-
             {/* PAGES SECTION */}
             <Typography
               variant="h6"
@@ -460,23 +440,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               {sidebarTranslations[language].Pages}
             </Typography>
-            {/* <Item
-              title="Calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            /> */}
-            {/* <Item
-              title="FAQPage"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            /> */}
-            {/* CHARTS SECTION */}
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -484,14 +448,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
             >
               {sidebarTranslations[language].Charts}
             </Typography>
-            <Item
+            {/* <Item
               title="BarChart"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
+            /> */}
             <Item
               title="PieChart"
               icon={<PieChartOutlineOutlinedIcon />}
@@ -500,22 +464,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
               setCurrentView={setCurrentView}
               closeDropdowns={closeDropdowns} // Pass closeDropdowns function
             />
-            {/* <Item
-              title="LineChart"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            /> */}
-            {/* <Item
-              title="GeographyChart"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            /> */}
           </Box>
         </Menu>
       </ProSidebar>
