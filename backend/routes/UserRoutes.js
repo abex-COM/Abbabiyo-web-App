@@ -14,7 +14,11 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 router.post("/register", registerUser);
 
 // Fetch all users
-router.get("/get-all-users", roleMiddleware("admin"), getAllUsers);
+router.get(
+  "/get-all-users",
+  roleMiddleware(["admin", "superadmin"]),
+  getAllUsers
+);
 
 // Fetch a single user by ID
 router.get("/get-a-user/:id", getUserById);

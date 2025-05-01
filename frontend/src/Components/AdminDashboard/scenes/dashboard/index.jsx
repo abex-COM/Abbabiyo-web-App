@@ -15,6 +15,7 @@ import ProgressCircle from "../../components/ProgressCircle";
 import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
 import { useEffect, useState } from "react";
 import axios from "axios";
+import useUserData from "../../../../hooks/useUserData";
 
 // Translation dictionary for the Dashboard
 const dashboardTranslations = {
@@ -85,6 +86,7 @@ const dashboardTranslations = {
 };
 
 const Dashboard = () => {
+  const user = useUserData();
   const [dashboardData, setDashboardData] = useState(0);
   const token = localStorage.getItem("token");
   const [data, setData] = useState([]);
@@ -108,7 +110,6 @@ const Dashboard = () => {
             },
           }
         );
-        console.log(res.data);
 
         setDashboardData(res.data);
       } catch (error) {
@@ -197,10 +198,6 @@ const Dashboard = () => {
             alignItems="center"
             mt="25px"
           >
-            <ProgressCircle
-              progress={(dashboardData?.totalFarmers || 0) / 100}
-              size="125"
-            />
             <Typography
               variant="h5"
               color={colors.greenAccent[500]}
@@ -227,7 +224,9 @@ const Dashboard = () => {
             fontWeight="600"
             sx={{ padding: "30px 30px 0 30px" }}
           >
-            {dashboardTranslations[language].salesQuantity}
+            {user?.role === "superadmin"
+              ? "Farmers By Zone"
+              : "Farmers By Woreda"}
           </Typography>
           <Box height="250px" width="700px" mt="-20px">
             <BarChart data={data} isDashboard={true} />

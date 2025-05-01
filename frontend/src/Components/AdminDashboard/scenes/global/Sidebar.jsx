@@ -174,13 +174,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
-  // const [user, setUser] = useState({
-  //   fullName: "",
-  //   username: "",
-  //   email: "",
-  //   profileImage: "default.png", // Default profile image
-  //   role: "", // Add role to the user state
-  // });
+
   const user = useUserData();
   // State to manage dropdown open/close
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -203,35 +197,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
     setIsManageOpen(!isManageOpen);
     setIsCreateOpen(false); // Close Create dropdown when Manage is opened
   };
-
-  // Fetch user data on component mount
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) return;
-
-  //     const userId = JSON.parse(atob(token.split(".")[1])).id; // Extract user ID from JWT
-
-  //     try {
-  //       const response = await axios.get(
-  //         `http://localhost:5000/api/admin/get-admin/${userId}`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-  //       console.log(response.data);
-
-  //       // Update state with user data
-  //       setUser(response.data.admin);
-
-  //       // Log the image path for debugging
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-
-  //   fetchUserData();
-  // }, []);
 
   const { language } = useLanguage(); // Get the current language
 
@@ -431,39 +396,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                 closeDropdowns={closeDropdowns} // Pass closeDropdowns function
               />
             </SubMenu>
-
-            {/* PAGES SECTION */}
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              {sidebarTranslations[language].Pages}
-            </Typography>
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              {sidebarTranslations[language].Charts}
-            </Typography>
-            {/* <Item
-              title="BarChart"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            /> */}
-            <Item
-              title="PieChart"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              setCurrentView={setCurrentView}
-              closeDropdowns={closeDropdowns} // Pass closeDropdowns function
-            />
           </Box>
         </Menu>
       </ProSidebar>

@@ -24,7 +24,6 @@ const AdminSchema = new mongoose.Schema({
       "zone is required for admin",
     ],
   },
-
   failedAttempts: { type: Number, default: 0 },
   lockUntil: { type: Date, default: null },
 });

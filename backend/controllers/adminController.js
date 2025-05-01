@@ -7,7 +7,7 @@ const path = require("path");
 
 // Create an admin(non-super)
 const createAdmin = async (req, res) => {
-  const { fullName, username, email, password, zone } = req.body;
+  const { fullName, username, email, password, zone, woreda } = req.body;
 
   try {
     const existingUser = await Admin.findOne({
@@ -27,6 +27,7 @@ const createAdmin = async (req, res) => {
       password,
       role: "admin",
       zone,
+      woreda,
     });
 
     await admin.save();
@@ -193,16 +194,25 @@ const getAdminById = async (req, res) => {
 // routes/userRoutes.js
 const getDashboardData = async (req, res) => {
   try {
-    const farmers = await User.find(); // Or role: "farmer"
-    const admins = await Admin.find();
-
-    // Example: map farmers to get number of sales or campaigns they’re involved in
-    const data = {
-      totalFarmers: farmers.length,
-      totalAdmins: admins.length,
-      // You can add other computations here
-    };
-
+    let data;
+    let farmers; // Or role: "farmer"
+    let admins;
+    if (req.user.role === "superadmin") {
+      farmers = await User.find();
+      admins = await Admin.find();
+      data = {
+        totalFarmers: farmers.length,
+        totalAdmins: admins.length,
+        // You can add other computations here
+      };
+    } else {
+      farmers = await User.find({ "location.zone": req.user.zone });
+      data = {
+        totalFarmers: farmers.length,
+        totalAdmins: 0,
+        // You can add other computations here
+      };
+    }
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });

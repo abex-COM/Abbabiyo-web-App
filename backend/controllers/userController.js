@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Admin = require("../models/adminModel");
 const jwt = require("jsonwebtoken");
 exports.registerUser = async (req, resp) => {
   try {
@@ -152,7 +153,21 @@ exports.getFramersperZone = async (req, res) => {
         },
       ]);
     } else if (req.user.role === "admin") {
+      // First, find the admin's woreda
+      const admin = await Admin.findById(req.user.id);
+
+      if (!admin) {
+        return res.status(400).json({ error: "Admin location not found" });
+      }
+
+      // const adminWoreda = admin.zone;
+
       result = await User.aggregate([
+        {
+          $match: {
+            "location.zone": req.user.zone, // Filter by admin's zone
+          },
+        },
         {
           $group: {
             _id: "$location.woreda",
@@ -171,30 +186,7 @@ exports.getFramersperZone = async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: "Failed to get data" });
+    console.error(error);
+    res.status(500).json({ status: "fail", error: error.message });
   }
 };
-
-// exports.getFramersperWoreda = async (req, res) => {
-//   try {
-//     const result = await User.aggregate([
-//       {
-//         $group: {
-//           _id: "$location.woreda",
-//           farmerCount: { $sum: 1 },
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           woreda: "$_id",
-//           Farmers: "$farmerCount",
-//         },
-//       },
-//     ]);
-
-//     res.json(result);
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to get data" });
-//   }
-// };

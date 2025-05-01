@@ -30,7 +30,11 @@ router.put("/update/:id", roleMiddleware("superadmin"), updateAdmin);
 router.delete("/delete/:id", roleMiddleware("superadmin"), deleteAdmin);
 // for developmen only
 router.post("/register-superadmin", registerSuperAdmin);
-router.get("/dashboard-data", getDashboardData);
+router.get(
+  "/dashboard-data",
+  roleMiddleware(["admin", "superadmin"]),
+  getDashboardData
+);
 // New route for updating profile
 router.put(
   "/update-profile/:id",

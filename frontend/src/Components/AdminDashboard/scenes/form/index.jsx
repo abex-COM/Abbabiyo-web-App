@@ -1,7 +1,6 @@
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -13,7 +12,8 @@ import ethiopianRegions, {
   ethiopianWoredas,
   ethiopianZones,
 } from "./../../../../constants/ethiopianData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useUserData from "../../../../hooks/useUserData";
 const farmerTranslations = {
   en: {
     title: "CREATE FARMER",
@@ -107,16 +107,25 @@ const farmerTranslations = {
 };
 
 const Form = () => {
-  // const isNonMobile = useMediaQuery("(min-width:600px)");
+  // const userZone = JSON.parse(atob(token.split(".")[1])).zone;
+  // const userrole = JSON.parse(atob(token.split(".")[1])).role;
   const { language } = useLanguage();
-
-  const [selectedRegion, setSelectedRegion] = useState("");
+  const user = useUserData();
+  const [selectedRegion, setSelectedRegion] = useState("Oromia");
   const [selectedZone, setSelectedZone] = useState("");
-
   const regions = ethiopianRegions;
   const zones = selectedRegion ? ethiopianZones[selectedRegion] || [] : [];
   const woredas = selectedZone ? ethiopianWoredas[selectedZone] || [] : [];
-
+  const initialValues = {
+    name: "",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+    region: "Oromia",
+    zone: user?.role === "admin" ? user.zone : "",
+    woreda: "",
+  };
+  // Decode token to get user ID
   const handleFormSubmit = async (values, { resetForm }) => {
     try {
       const dataToSend = {
@@ -176,16 +185,11 @@ const Form = () => {
       .required(farmerTranslations[language].validation.woredaRequired),
   });
 
-  const initialValues = {
-    name: "",
-    phoneNumber: "",
-    password: "",
-    confirmPassword: "",
-    region: "",
-    zone: "",
-    woreda: "",
-  };
-
+  useEffect(() => {
+    if (user?.role === "admin" && user?.zone) {
+      setSelectedZone(user.zone);
+    }
+  }, [user]);
   return (
     <Box m="20px" height="1000px">
       <ToastContainer />
@@ -277,6 +281,7 @@ const Form = () => {
                   setFieldValue("zone", "");
                   setFieldValue("woreda", "");
                 }}
+                disabled
               >
                 {regions.map((region) => (
                   <MenuItem key={region.value} value={region.value}>
@@ -298,7 +303,7 @@ const Form = () => {
                   setSelectedZone(selected);
                   setFieldValue("woreda", "");
                 }}
-                disabled={!selectedRegion}
+                disabled={user?.role === "admin" ? true : !selectedRegion}
               >
                 {zones.map((zone) => (
                   <MenuItem key={zone.value} value={zone.value}>
@@ -315,7 +320,7 @@ const Form = () => {
                 name="woreda"
                 value={values.woreda}
                 onChange={handleChange}
-                disabled={!selectedZone}
+                disabled={user?.role === "admin" ? false : !selectedZone}
               >
                 {woredas.map((woreda) => (
                   <MenuItem key={woreda.value} value={woreda.value}>

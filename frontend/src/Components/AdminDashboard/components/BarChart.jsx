@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
-import { Box } from "@mui/material"; // Box from MUI
+import { Box } from "@mui/material";
 import useUserData from "./../../../hooks/useUserData";
 
 const BarChart = ({ data = [], isDashboard = false }) => {
@@ -10,20 +10,21 @@ const BarChart = ({ data = [], isDashboard = false }) => {
   const user = useUserData();
   let formattedData = [];
 
-  if (user?.role === "superadmin") {
+  if (!user) return <div>Loading...</div>;
+
+  if (user.role === "superadmin") {
     formattedData = data.map((item) => ({
-      region: item.region, // superadmin data uses "region"
+      region: item.region, // from backend you send "region"
       farmers: item.Farmers,
     }));
-  } else if (user?.role === "admin") {
+  } else if (user.role === "admin") {
     formattedData = data.map((item) => ({
-      region: item.woreda, // admin data uses "woreda", but map it to "region"
+      region: item.woreda, // notice: map 'woreda' into 'region' field
       farmers: item.Farmers,
     }));
   }
 
-  // Fallback for safety
-  if (!formattedData || formattedData.length === 0) {
+  if (formattedData.length === 0) {
     return <div>No data available for the chart</div>;
   }
 
@@ -31,8 +32,6 @@ const BarChart = ({ data = [], isDashboard = false }) => {
     <Box height="100%" width="100%">
       <ResponsiveBar
         data={formattedData}
-        keys={["farmers"]}
-        indexBy="region" // Always use "region" as index
         theme={{
           axis: {
             domain: { line: { stroke: colors.grey[100] } },
@@ -44,31 +43,13 @@ const BarChart = ({ data = [], isDashboard = false }) => {
           },
           legends: { text: { fill: colors.grey[100] } },
         }}
+        keys={["farmers"]}
+        indexBy="region" // Always index by 'region' (even for woreda admins)
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
         valueScale={{ type: "linear" }}
         indexScale={{ type: "band", round: true }}
         colors={{ scheme: "nivo" }}
-        defs={[
-          {
-            id: "dots",
-            type: "patternDots",
-            background: "inherit",
-            color: "#38bcb2",
-            size: 4,
-            padding: 1,
-            stagger: true,
-          },
-          {
-            id: "lines",
-            type: "patternLines",
-            background: "inherit",
-            color: "#eed312",
-            rotation: -45,
-            lineWidth: 6,
-            spacing: 10,
-          },
-        ]}
         borderColor={{
           from: "color",
           modifiers: [["darker", "1.6"]],
@@ -79,7 +60,7 @@ const BarChart = ({ data = [], isDashboard = false }) => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: isDashboard ? undefined : "Region/Woreda",
+          legend: isDashboard ? undefined : "Region / Woreda",
           legendPosition: "middle",
           legendOffset: 32,
         }}
@@ -98,17 +79,17 @@ const BarChart = ({ data = [], isDashboard = false }) => {
             anchor: "bottom-right",
             direction: "column",
             translateX: 120,
-            translateY: 0,
-            itemsSpacing: 2,
             itemWidth: 100,
             itemHeight: 20,
+            itemsSpacing: 2,
+            itemDirection: "left-to-right",
+            itemOpacity: 0.85,
             symbolSize: 20,
-            effects: [{ on: "hover", style: { itemOpacity: 1 } }],
           },
         ]}
         role="application"
-        barAriaLabel={(e) =>
-          `${e.id}: ${e.formattedValue} farmers in region: ${e.indexValue}`
+        barAriaLabel={({ id, formattedValue, indexValue }) =>
+          `${id}: ${formattedValue} farmers in region: ${indexValue}`
         }
       />
     </Box>
