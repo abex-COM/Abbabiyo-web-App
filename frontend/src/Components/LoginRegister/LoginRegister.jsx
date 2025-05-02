@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./LoginRegister.css";
 import { tokens } from "./theme";
 import axios from "axios";
+import baseUrl from "../../baseUrl/baseUrl";
 // Translation dictionary
 const translations = {
   en: {
@@ -126,11 +127,8 @@ const LoginRegister = () => {
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
     try {
-      const res = await axios.post(
-        `http://localhost:5000/api/admin/login`,
-        formData
-      );
-      console.log("Login response:", res.data); // Log the response for debugging
+      const res = await axios.post(`${baseUrl}/api/admin/login`, formData);
+      // console.log("Login response:", res.data); // Log the response for debugging
 
       const { token } = res.data;
       localStorage.setItem("token", token);

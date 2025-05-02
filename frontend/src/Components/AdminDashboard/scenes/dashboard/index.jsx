@@ -16,6 +16,7 @@ import { useLanguage } from "../../LanguageContext"; // Import the useLanguage h
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useUserData from "../../../../hooks/useUserData";
+import baseUrl from "../../../../baseUrl/baseUrl";
 
 // Translation dictionary for the Dashboard
 const dashboardTranslations = {
@@ -102,14 +103,11 @@ const Dashboard = () => {
       // Check if the token is valid (optional, depending on your authentication flow)
 
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/admin/dashboard-data",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${baseUrl}/api/admin/dashboard-data`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         setDashboardData(res.data);
       } catch (error) {
@@ -122,14 +120,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchFarmers = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/admin/farmers-per-region",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${baseUrl}/api/admin/farmers-per-region`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setData(res.data);
       } catch (err) {
         console.error("Failed to load farmer stats", err);

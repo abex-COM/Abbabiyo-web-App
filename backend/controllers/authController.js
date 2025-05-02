@@ -55,6 +55,7 @@ const login = async (req, res) => {
         role: admin.role,
         zone: admin.zone,
         fullName: admin.fullName,
+        profileImage: admin.profileImage,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }

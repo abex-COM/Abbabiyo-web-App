@@ -5,6 +5,9 @@ import {
   Modal,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -16,6 +19,12 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
+import { MenuItem } from "@mui/material"; // Make sure this import exists
+import ethiopianRegions, {
+  ethiopianWoredas,
+  ethiopianZones,
+} from "../../../../constants/ethiopianData";
+import baseUrl from "../../../../baseUrl/baseUrl";
 
 // Translation dictionary
 export const teamTranslations = {
@@ -135,6 +144,8 @@ export const teamTranslations = {
 };
 
 const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
+  const [availableWoredas, setAvailableWoredas] = useState([]);
+
   const [formData, setFormData] = useState({
     name: farmer?.name || "",
     phoneNumber: farmer?.phoneNumber || "",
@@ -143,10 +154,23 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
     woreda: farmer?.location?.woreda || "",
     _id: farmer?._id,
   });
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const updatedFormData = { ...formData, [name]: value };
+
+    if (name === "region") {
+      // Reset both zone and woreda when region changes
+      updatedFormData.zone = "";
+      updatedFormData.woreda = "";
+      setAvailableWoredas([]);
+    } else if (name === "zone") {
+      // Reset woreda and update available woredas when zone changes
+      updatedFormData.woreda = "";
+      const zoneWoredas = ethiopianWoredas[value] || [];
+      setAvailableWoredas(zoneWoredas);
+    }
+
+    setFormData(updatedFormData);
   };
 
   const handleSubmit = (e) => {
@@ -166,6 +190,12 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
     onSave(updatedData);
     onClose();
   };
+  useEffect(() => {
+    if (farmer?.location?.zone) {
+      const zoneWoredas = ethiopianWoredas[farmer.location.zone] || [];
+      setAvailableWoredas(zoneWoredas);
+    }
+  }, [farmer]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -199,30 +229,54 @@ const EditFarmerModal = ({ open, onClose, farmer, onSave, language }) => {
             onChange={handleChange}
             margin="normal"
           />
-          <TextField
-            fullWidth
-            label={teamTranslations[language].regionLabel}
-            name="region"
-            value={formData.region}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label={teamTranslations[language].zoneLabel}
-            name="zone"
-            value={formData.zone}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label={teamTranslations[language].woredaLabel}
-            name="woreda"
-            value={formData.woreda}
-            onChange={handleChange}
-            margin="normal"
-          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>{teamTranslations[language].regionLabel}</InputLabel>
+            <Select
+              name="region"
+              value={formData.region}
+              onChange={handleChange}
+              label={teamTranslations[language].regionLabel}
+            >
+              {ethiopianRegions.map((zone) => (
+                <MenuItem key={zone.value} value={zone.value}>
+                  {zone.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>{teamTranslations[language].zoneLabel}</InputLabel>
+            <Select
+              name="zone"
+              value={formData.zone}
+              onChange={handleChange}
+              label={teamTranslations[language].zoneLabel}
+            >
+              {ethiopianZones["Oromia"].map((zone) => (
+                <MenuItem key={zone.value} value={zone.value}>
+                  {zone.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>{teamTranslations[language].woredaLabel}</InputLabel>
+            <Select
+              name="woreda"
+              value={formData.woreda}
+              onChange={handleChange}
+              label={teamTranslations[language].woredaLabel}
+            >
+              {availableWoredas.map((woreda) => (
+                <MenuItem key={woreda.value} value={woreda.value}>
+                  {woreda.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button
               onClick={onClose}
@@ -255,22 +309,21 @@ const Farmers = () => {
 
     const fetchFarmers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/users/get-all-users",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/users/get-all-users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const data = response.data || [];
 
         // Preprocess and flatten the data
-        const processedFarmers = data.map((farmer) => ({
-          ...farmer,
-          region: farmer?.location?.region || "", // Add region field directly to the farmer object
-          zone: farmer?.location?.zone || "", // Add zone field directly to the farmer object
-          woreda: farmer?.location?.woreda || "", // Add woreda field directly to the farmer object
-        }));
+        const processedFarmers = data
+          .filter((farmer) => farmer && farmer._id) // Filter out null/undefined farmers and those without _id
+          .map((farmer) => ({
+            ...farmer,
+            region: farmer?.location?.region || "",
+            zone: farmer?.location?.zone || "",
+            woreda: farmer?.location?.woreda || "",
+          }));
 
         setFarmers(processedFarmers);
       } catch (error) {
@@ -281,12 +334,13 @@ const Farmers = () => {
   }, []);
 
   const handleDelete = async (id) => {
+    if (!id) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/users/delete/${id}`, {
+      await axios.delete(`${baseUrl}/api/users/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFarmers(farmers.filter((farmer) => farmer._id !== id));
+      setFarmers(farmers.filter((farmer) => farmer?._id !== id));
       toast.success(teamTranslations[language].deleteSuccess);
     } catch (error) {
       console.error("Error deleting farmer:", error);
@@ -300,10 +354,11 @@ const Farmers = () => {
   };
 
   const handleSave = async (updatedFarmer) => {
+    if (!updatedFarmer) return;
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `http://localhost:5000/api/farmers/farmers/${updatedFarmer._id}`,
+        `${baseUrl}/api/users/update-user/${updatedFarmer?._id}`,
         updatedFarmer,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -312,7 +367,7 @@ const Farmers = () => {
 
       setFarmers((prevFarmers) =>
         prevFarmers.map((farmer) =>
-          farmer._id === updatedFarmer._id ? response.data.farmer : farmer
+          farmer?._id === updatedFarmer?._id ? response.data?.farmer : farmer
         )
       );
       toast.success(teamTranslations[language].updateSuccess);
@@ -411,7 +466,7 @@ const Farmers = () => {
           checkboxSelection
           rows={farmers}
           columns={columns}
-          getRowId={(row) => row._id}
+          getRowId={(row) => row?._id}
         />
       </Box>
 

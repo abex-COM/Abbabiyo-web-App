@@ -8,8 +8,8 @@ let gfs;
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.Local_DB_URL);
-    console.log("Local MongoDB connected");
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected");
 
     // Initialize GridFS
     const db = conn.connection.db;

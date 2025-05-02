@@ -67,7 +67,7 @@ const getAdmins = async (req, res) => {
 // Update admin details
 const updateAdmin = async (req, res) => {
   const { id } = req.params;
-  const { fullName, username, email, password } = req.body;
+  const { fullName, username, email, password, zone } = req.body;
 
   try {
     const admin = await Admin.findById(id);
@@ -79,11 +79,7 @@ const updateAdmin = async (req, res) => {
     admin.fullName = fullName || admin.fullName;
     admin.username = username || admin.username;
     admin.email = email || admin.email;
-
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      admin.password = await bcrypt.hash(password, salt);
-    }
+    admin.zone = zone || admin.zone;
 
     await admin.save();
     res.status(200).json({ message: "Admin updated successfully", admin });
@@ -125,11 +121,7 @@ const updateAdminProfile = async (req, res) => {
     admin.username = username || admin.username;
     admin.email = email || admin.email;
     admin.profileImage = profileImage || admin.profileImage;
-
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      admin.password = await bcrypt.hash(password, salt);
-    }
+    admin.password = password || admin.password;
 
     await admin.save();
     res.status(200).json({ message: "Profile updated successfully", admin });

@@ -1,4 +1,11 @@
-import { Box, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  TextField,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,6 +14,9 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
+import { MenuItem } from "@mui/material"; // Make sure this import exists
+import { ethiopianZones } from "../../../../constants/ethiopianData";
+import baseUrl from "../../../../baseUrl/baseUrl";
 
 // Translation dictionary
 const addAdminTranslations = {
@@ -14,6 +24,7 @@ const addAdminTranslations = {
     title: "CREATE ADMIN",
     subtitle: "Create a New Admin Profile",
     fullName: "Full Name",
+    zone: "Zone",
     username: "Username",
     email: "Email",
     password: "Password",
@@ -47,6 +58,7 @@ const addAdminTranslations = {
       emailInvalid: "ልክ ያልሆነ ኢሜይል",
       emailRequired: "ኢሜይል ያስፈልጋል",
       passwordRequired: "የይለፍ ቃል ያስፈልጋል",
+      zone: "ዞን ይምረጡ",
     },
   },
   om: {
@@ -55,6 +67,7 @@ const addAdminTranslations = {
     fullName: "Maqaa Guutuu",
     username: "Maqaa Fayyadamaa",
     email: "Imeelii",
+    zone: "Zoonii",
     password: "Jecha Iccitii",
     createButton: "Administraatoraa Haaraa Uumuu",
     success: "Administraatoraa muuxannoo ta'een uumame!",
@@ -98,13 +111,9 @@ const AddAdmin = () => {
       const token = localStorage.getItem("token");
 
       // Send a POST request to create a new admin
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/create",
-        values,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.post(`${baseUrl}/api/admin/create`, values, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       // Use the success message from the backend response
       toast.success(
@@ -123,8 +132,6 @@ const AddAdmin = () => {
       } else {
         toast.error(addAdminTranslations[language].error);
       }
-
-      resetForm();
     }
   };
 
@@ -147,19 +154,22 @@ const AddAdmin = () => {
     password: yup
       .string()
       .required(addAdminTranslations[language].validation.passwordRequired),
+    zone: yup
+      .string()
+      .required(addAdminTranslations[language].validation.zoneRequired),
   });
 
-  // Initial Values
+  // Initial Values with zone included
   const initialValues = {
     fullName: "",
     username: "",
     email: "",
     password: "",
+    zone: "",
   };
 
   return (
     <Box m="20px">
-      {/* Toast Container for notifications */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -172,13 +182,11 @@ const AddAdmin = () => {
         pauseOnHover
       />
 
-      {/* Header */}
       <Header
         title={addAdminTranslations[language].title}
         subtitle={addAdminTranslations[language].subtitle}
       />
 
-      {/* Formik Form */}
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -260,6 +268,34 @@ const AddAdmin = () => {
                 helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
+
+              {/* Zone Field */}
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ gridColumn: "span 4" }}
+                error={!!touched.zone && !!errors.zone}
+              >
+                <InputLabel>{addAdminTranslations[language].zone}</InputLabel>
+                <Select
+                  name="zone"
+                  value={values.zone}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  label={addAdminTranslations[language].zone}
+                >
+                  {ethiopianZones["Oromia"].map((zone) => (
+                    <MenuItem key={zone.value} value={zone.value}>
+                      {zone.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {touched.zone && errors.zone && (
+                  <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: 1 }}>
+                    {errors.zone}
+                  </Box>
+                )}
+              </FormControl>
             </Box>
 
             {/* Submit Button */}

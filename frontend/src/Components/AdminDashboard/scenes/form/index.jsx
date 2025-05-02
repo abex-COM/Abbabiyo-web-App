@@ -14,6 +14,7 @@ import ethiopianRegions, {
 } from "./../../../../constants/ethiopianData";
 import { useEffect, useState } from "react";
 import useUserData from "../../../../hooks/useUserData";
+import baseUrl from "../../../../baseUrl/baseUrl";
 const farmerTranslations = {
   en: {
     title: "CREATE FARMER",
@@ -107,8 +108,6 @@ const farmerTranslations = {
 };
 
 const Form = () => {
-  // const userZone = JSON.parse(atob(token.split(".")[1])).zone;
-  // const userrole = JSON.parse(atob(token.split(".")[1])).role;
   const { language } = useLanguage();
   const user = useUserData();
   const [selectedRegion, setSelectedRegion] = useState("Oromia");
@@ -141,10 +140,10 @@ const Form = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/users/register",
+        `${baseUrl}/api/users/register`,
         dataToSend
       );
-
+      console.log(dataToSend);
       toast.success(farmerTranslations[language].success);
       resetForm();
       setSelectedRegion("");

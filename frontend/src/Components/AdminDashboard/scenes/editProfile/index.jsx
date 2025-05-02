@@ -16,6 +16,8 @@ import defaultProfilePic from "../../assets/default.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
+import baseUrl from "../../../../baseUrl/baseUrl";
+import { Navigate, useNavigate } from "react-router-dom";
 
 // Translation dictionary for the EditProfile
 const editProfileTranslations = {
@@ -102,9 +104,8 @@ const EditProfile = () => {
   const fileInputRef = useRef(null);
   const { language } = useLanguage(); // Get the current language
   const token = localStorage.getItem("token");
-
+  const navigate = useNavigate();
   const userId = JSON.parse(atob(token.split(".")[1])).id;
-
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
@@ -112,7 +113,7 @@ const EditProfile = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/admin/get-admin/${userId}`,
+          `${baseUrl}/api/admin/get-admin/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -163,7 +164,7 @@ const EditProfile = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/admin/update-profile/${userId}`,
+        `${baseUrl}/api/admin/update-profile/${userId}`,
         formDataToSend,
         {
           headers: {
@@ -188,11 +189,7 @@ const EditProfile = () => {
 
       // Clear inputs after successful update
       resetForm();
-
-      // Force a full page reload after 1 second to show updated data everywhere
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      navigate(-1);
     } catch (err) {
       console.error(err);
       toast.error(
@@ -247,7 +244,7 @@ const EditProfile = () => {
             src={
               imagePreview ||
               (user?.profileImage
-                ? `http://localhost:5000/uploads/${user.profileImage}`
+                ? `${baseUrl}/uploads/${user.profileImage}`
                 : defaultProfilePic)
             }
             style={{

@@ -5,20 +5,12 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import axios from "axios";
 import defaultProfilePic from "../../assets/default.png"; // Import the default profile image
 import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
-import useUserData from "./../../../../hooks/useUserData";
+import useStoredUser from "../../../../hooks/useStoredUser";
+import baseUrl from "../../../../baseUrl/baseUrl";
 // Translation dictionary for the sidebar
 const sidebarTranslations = {
   en: {
@@ -175,7 +167,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
 
-  const user = useUserData();
+  const { user } = useStoredUser();
+
+  console.log(user?.role);
   // State to manage dropdown open/close
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
@@ -283,7 +277,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                 alt="profile-user"
                 src={
                   user?.profileImage
-                    ? `http://localhost:5000/uploads/${user.profileImage}`
+                    ? `${baseUrl}/uploads/${user.profileImage}`
                     : defaultProfilePic
                 }
                 style={{
@@ -308,12 +302,16 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, setCurrentView }) => {
                   {user?.fullName || "Fira Teferi"}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  {user?.role === "superadmin"
+                  {user?.role == "superadmin"
                     ? sidebarTranslations[language].SuperAdmin
                     : sidebarTranslations[language].Admin}
                 </Typography>
                 <Typography variant="h4" color={colors.grey[100]}>
-                  {user?.zone} Zone Admin
+                  {/* {user?.zone} Zone Admin */}
+
+                  {user?.role === "superadmin"
+                    ? ""
+                    : user?.zone + " Zone Admin"}
                 </Typography>
               </Box>
             )}

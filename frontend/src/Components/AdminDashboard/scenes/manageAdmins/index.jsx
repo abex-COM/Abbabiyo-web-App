@@ -5,6 +5,9 @@ import {
   Modal,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -12,11 +15,13 @@ import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import { MenuItem } from "@mui/material"; // Make sure this import exists
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLanguage } from "../../LanguageContext";
-
+import { ethiopianZones } from "../../../../constants/ethiopianData"; // Assuming you have a zones.js file with zone data
+import baseUrl from "../../../../baseUrl/baseUrl";
 // Translation dictionary
 const adminTranslations = {
   en: {
@@ -36,6 +41,7 @@ const adminTranslations = {
     updateError: "Failed to update admin. Please try again.",
     cancel: "Cancel",
     save: "Save",
+    zone: "Zone",
     fullNameLabel: "Full Name",
     usernameLabel: "Username",
     emailLabel: "Email",
@@ -53,6 +59,7 @@ const adminTranslations = {
     role: "የስራ መደብ",
     actions: "ድርጊቶች",
     edit: "አርትዕ",
+    zone: "ዞን",
     delete: "ሰርዝ",
     deleteSuccess: "አስተዳዳሪ በተሳካ ሁኔታ ተሰርዟል!",
     deleteError: "አስተዳዳሪን ማስወገድ አልተቻለም። እባክዎ ደግመው ይሞክሩ።",
@@ -78,6 +85,7 @@ const adminTranslations = {
     actions: "Hojiiwwan",
     edit: "Sirreessuu",
     delete: "Haquu",
+    zone: "Zoonii",
     deleteSuccess: "Administraatoriin muuxannoo ta'een haqame!",
     deleteError: "Administraatorii haquu hindandeenye. Irra deebi'ii yaali.",
     updateSuccess: "Administraatorii muuxannoo ta'een sirreeffame!",
@@ -125,6 +133,7 @@ const EditAdminModal = ({ open, onClose, admin, onSave, language }) => {
     fullName: admin?.fullName || "",
     username: admin?.username || "",
     email: admin?.email || "",
+    zone: admin?.zone || "", // ✅ Include zone in state
   });
 
   const handleChange = (e) => {
@@ -169,6 +178,22 @@ const EditAdminModal = ({ open, onClose, admin, onSave, language }) => {
             onChange={handleChange}
             margin="normal"
           />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>{adminTranslations[language].zone}</InputLabel>
+            <Select
+              name="zone"
+              value={formData.zone}
+              onChange={handleChange}
+              label={adminTranslations[language].zone}
+            >
+              {ethiopianZones["Oromia"].map((zone) => (
+                <MenuItem key={zone.value} value={zone.value}>
+                  {zone.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             fullWidth
             label={adminTranslations[language].emailLabel}
@@ -215,12 +240,9 @@ const ManageAdmins = () => {
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/get-all-admin",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/admin/get-all-admin`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         // Normalize the data: Ensure every admin has a `role` field
         const normalizedAdmins = response.data.map((admin) => ({
@@ -248,7 +270,7 @@ const ManageAdmins = () => {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/delete/${id}`, {
+      await axios.delete(`${baseUrl}/api/admin/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAdmins(admins.filter((admin) => admin._id !== id));
@@ -273,7 +295,7 @@ const ManageAdmins = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `http://localhost:5000/api/admin/update/${selectedAdmin._id}`,
+        `${baseUrl}/api/admin/update/${selectedAdmin._id}`,
         updatedAdmin,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -319,6 +341,11 @@ const ManageAdmins = () => {
     {
       field: "role",
       headerName: adminTranslations[language].role,
+      flex: 1,
+    },
+    {
+      field: "zone",
+      headerName: adminTranslations[language].zone,
       flex: 1,
     },
     {

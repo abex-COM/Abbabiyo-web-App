@@ -59,39 +59,24 @@ exports.getUserById = async (req, res) => {
 };
 // Update User function - updated to handle image uploads similar to createPost
 exports.updateUser = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { name, phoneNumber, password } = req.body;
-    let profilePicture = req.user.profilePicture; // Default to existing profile picture
+    const { name, phoneNumber, location } = req.body;
+    const { region, zone, woreda } = location;
 
-    if (req.file) {
-      // If a new profile image is uploaded
-      profilePicture = `${req.protocol}://${req.get("host")}/uploads/${
-        req.file.filename
-      }`;
-    }
-
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the password matches the one in the database
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
-    }
-
     // Update user data
     if (name) user.name = name;
     if (phoneNumber) user.phoneNumber = phoneNumber;
-    if (profilePicture) user.profilePicture = profilePicture;
-
+    if (region) user.location.region = region;
+    if (woreda) user.location.woreda = woreda;
+    if (zone) user.location.zone = zone;
     await user.save();
-
-    // Send WebSocket event after updating user data
-    const io = req.app.get("socketio");
-    io.to(user._id).emit("userUpdated", user); // Emit the updated user data
 
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (err) {
@@ -101,6 +86,7 @@ exports.updateUser = async (req, res) => {
       .json({ message: "Failed to update profile.", error: err.message });
   }
 };
+
 exports.deleteUserById = async (req, res) => {
   const { id } = req.params;
 
