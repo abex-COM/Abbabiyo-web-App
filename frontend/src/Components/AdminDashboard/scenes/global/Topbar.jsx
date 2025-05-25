@@ -32,7 +32,7 @@ const Topbar = ({ setCurrentView }) => {
   const isLanguageMenuOpen = Boolean(languageAnchorEl);
 
   // Get language and changeLanguage function from context
-  const { language, changeLanguage } = useLanguage();
+  const { changeLanguage } = useLanguage();
 
   // Profile dropdown handlers
   const handleProfileHover = (event) => {
@@ -44,8 +44,8 @@ const Topbar = ({ setCurrentView }) => {
   };
 
   const handleEditProfile = () => {
-    navigate("/edit-profile");
-    // setCurrentView("EditProfile");
+    // navigate("/edit-profile");
+    setCurrentView("EditProfile");
     handleProfileMenuClose();
   };
 
@@ -86,10 +86,10 @@ const Topbar = ({ setCurrentView }) => {
         backgroundColor={colors.primary[400]}
         borderRadius="10px"
       >
-        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
+        {/* <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
         <IconButton type="button" sx={{ p: 1 }}>
           <SearchIcon />
-        </IconButton>
+        </IconButton> */}
       </Box>
 
       {/* ICONS */}

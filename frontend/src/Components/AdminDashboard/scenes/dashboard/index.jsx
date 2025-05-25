@@ -1,36 +1,36 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  MenuItem,
+  Select,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
+
 import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
-import StatBox from "../../components/StatBox";
-import ProgressCircle from "../../components/ProgressCircle";
-import { useLanguage } from "../../LanguageContext"; // Import the useLanguage hook
+
+import { useLanguage } from "../../LanguageContext";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useUserData from "../../../../hooks/useUserData";
 import baseUrl from "../../../../baseUrl/baseUrl";
 
-// Translation dictionary for the Dashboard
 const dashboardTranslations = {
   en: {
     dashboardTitle: "DASHBOARD",
     dashboardSubtitle: "Welcome to your dashboard",
-    downloadReports: "Download Reports",
+    downloadReports: "Export Excel",
     emailsSent: "Emails Sent",
     salesObtained: "Sales Obtained",
     newClients: "New Clients",
     trafficReceived: "Traffic Received",
     revenueGenerated: "Revenue Generated",
     recentTransactions: "Recent Transactions",
-    campaign: "Total Registered Farmers", // updated
+    campaign: "Total Registered Farmers",
     salesQuantity: "Farmers By Zone",
     geographyBasedTraffic: "Geography Based Traffic",
     revenueGeneratedText: "$48,352 revenue generated",
@@ -39,14 +39,14 @@ const dashboardTranslations = {
   am: {
     dashboardTitle: "ዳሽቦርድ",
     dashboardSubtitle: "ወደ ዳሽቦርድዎ እንኳን በደህና መጡ",
-    downloadReports: "ሪፖርቶችን አውርድ",
+    downloadReports: "ኤክሴል ሪፖርት ይውርዱ",
     emailsSent: "ኢሜሎች ተልከዋል",
     salesObtained: "የተገኙ ሽያጮች",
     newClients: "አዲስ ደንበኞች",
     trafficReceived: "የተቀበለ ትራፊክ",
     revenueGenerated: "የሚገኝ ገቢ",
     recentTransactions: "የቅርብ ጊዜ ግብይቶች",
-    campaign: "የተመዘገቡ ገበሬዎች ጠቅላላ ብዛት", // updated
+    campaign: "የተመዘገቡ ገበሬዎች ጠቅላላ ብዛት",
     salesQuantity: "የክልል ያነፈ ገበሬዎች",
     geographyBasedTraffic: "በጂኦግራፊ ላይ የተመሰረተ ትራፊክ",
     revenueGeneratedText: "$48,352 ገቢ ተፈጥሯል",
@@ -55,14 +55,14 @@ const dashboardTranslations = {
   om: {
     dashboardTitle: "Daashboordii",
     dashboardSubtitle: "Baga daashboordii kee seenaa",
-    downloadReports: "Raapportii dhiyeessuu",
+    downloadReports: "Eksel dhiyeessuu",
     emailsSent: "Imeelii ergame",
     salesObtained: "Gatii gurguramaa",
     newClients: "Miseensota haaraa",
     trafficReceived: "Traafiifi qabadame",
     revenueGenerated: "Mallaqa argame",
     recentTransactions: "Gareen walqabsiisaa",
-    campaign: "Baay'ina Guutuu Faarmerootaa", // updated
+    campaign: "Baay'ina Guutuu Faarmerootaa",
     salesQuantity: "Faarmeroota Naannoo",
     geographyBasedTraffic: "Traafiifi geografii irratti hundaa’e",
     revenueGeneratedText: "$48,352 mallaqa argame",
@@ -78,7 +78,7 @@ const dashboardTranslations = {
     trafficReceived: "ትራፊክ ተቐቢሉ",
     revenueGenerated: "ገቢ ተፈጢሩ",
     recentTransactions: "ቀረባ ግብይት",
-    campaign: "ድምሩ ዝተመዝገቡ ኣራሒታት", // updated
+    campaign: "ድምሩ ዝተመዝገቡ ኣራሒታት",
     salesQuantity: "ብዝሒ ኣራሒታት ናይ ዞባ",
     geographyBasedTraffic: "ትራፊክ ኣብ ጂኦግራፊ ዝተመስረተ",
     revenueGeneratedText: "$48,352 ገቢ ተፈጢሩ",
@@ -88,49 +88,85 @@ const dashboardTranslations = {
 
 const Dashboard = () => {
   const user = useUserData();
-  const [dashboardData, setDashboardData] = useState(0);
+  const [dashboardData, setDashboardData] = useState({});
   const token = localStorage.getItem("token");
   const [data, setData] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { language } = useLanguage(); // Get the current language
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!token) {
-        console.error("No token found in local storage");
-        return;
-      }
-      // Check if the token is valid (optional, depending on your authentication flow)
+  const { language } = useLanguage();
 
-      try {
-        const res = await axios.get(`${baseUrl}/api/admin/dashboard-data`, {
+  const [woredas, setWoredas] = useState([]);
+  const [selectedWoreda, setSelectedWoreda] = useState("");
+  const downloadReport = async () => {
+    if (!selectedWoreda) {
+      alert("Please select a woreda to download the report.");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${baseUrl}/api/admin/download-report?woreda=${selectedWoreda}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+          responseType: "blob", // Important for downloading files
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${selectedWoreda}_report.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading report:", error);
+      alert("Failed to download report. Please try again.");
+    }
+  };
+  useEffect(() => {
+    const fetchWoredas = async () => {
+      try {
+        const res = await axios.get(
+          `${baseUrl}/api/admin/getUsersworedas?zone=${user.zone}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setWoredas(res.data);
+      } catch (err) {
+        console.error("Failed to load woredas", err);
+      }
+    };
+    fetchWoredas();
+  }, [user.zone, token]);
 
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!token) return;
+      try {
+        const res = await axios.get(`${baseUrl}/api/admin/dashboard-data`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setDashboardData(res.data);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
       }
     };
-
     fetchDashboardData();
   }, [token]);
+
   useEffect(() => {
     const fetchFarmers = async () => {
       try {
         const res = await axios.get(`${baseUrl}/api/admin/farmers-per-region`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setData(res.data);
       } catch (err) {
         console.error("Failed to load farmer stats", err);
       }
     };
-
     fetchFarmers();
   }, [token]);
   return (
@@ -141,47 +177,66 @@ const Dashboard = () => {
           title={dashboardTranslations[language].dashboardTitle}
           subtitle={dashboardTranslations[language].dashboardSubtitle}
         />
+        {user.role === "admin" ? (
+          <Box display="flex" alignItems="center" gap={2}>
+            <Select
+              value={selectedWoreda}
+              onChange={(e) => setSelectedWoreda(e.target.value)}
+              sx={{
+                width: "200px",
+                backgroundColor: colors.primary[400],
+                color: colors.grey[100],
+              }}
+              displayEmpty
+            >
+              <MenuItem value="">Select Woreda to Download</MenuItem>
+              {woredas.map((woreda, index) => (
+                <MenuItem key={index} value={woreda}>
+                  {woreda}
+                </MenuItem>
+              ))}
+            </Select>
 
-        <Box>
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              "&:hover": {
-                backgroundColor: colors.blueAccent[800],
-              },
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            {dashboardTranslations[language].downloadReports}
-          </Button>
-        </Box>
+            <Button
+              onClick={downloadReport}
+              sx={{
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                "&:hover": {
+                  backgroundColor: colors.blueAccent[800],
+                },
+              }}
+            >
+              <DownloadOutlinedIcon sx={{ mr: "10px" }} />
+              {dashboardTranslations[language].downloadReports}
+            </Button>
+          </Box>
+        ) : (
+          ""
+        )}
       </Box>
 
       {/* GRID & CHARTS */}
       <Box
         display="flex"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
         justifyContent="space-around"
         gap="20px"
+        flexWrap="wrap"
+        mt="20px"
       >
-        {/* ROW 3 */}
+        {/* Total Farmers */}
         <Box
-          gridColumn="span 4"
-          gridRow="span 2"
+          flex="1 1 300px"
           backgroundColor={colors.primary[400]}
           p="30px"
+          borderRadius="5px"
           sx={{
-            borderRadius: "5px",
             transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.02)",
-            },
+            "&:hover": { transform: "scale(1.02)" },
           }}
         >
           <Typography variant="h5" fontWeight="600">
@@ -202,28 +257,24 @@ const Dashboard = () => {
             </Typography>
           </Box>
         </Box>
+
+        {/* Farmers by Zone/Woreda */}
         <Box
-          gridColumn="span 4"
-          gridRow="span 2"
+          flex="1 1 700px"
           backgroundColor={colors.primary[400]}
+          borderRadius="5px"
+          p="30px"
           sx={{
-            borderRadius: "5px",
             transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.02)",
-            },
+            "&:hover": { transform: "scale(1.02)" },
           }}
         >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
+          <Typography variant="h5" fontWeight="600">
             {user?.role === "superadmin"
-              ? "Farmers By Zone"
+              ? dashboardTranslations[language].salesQuantity
               : "Farmers By Woreda"}
           </Typography>
-          <Box height="250px" width="700px" mt="-20px">
+          <Box height="250px" mt="20px">
             <BarChart data={data} isDashboard={true} />
           </Box>
         </Box>

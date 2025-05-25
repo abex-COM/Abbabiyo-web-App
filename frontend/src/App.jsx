@@ -7,8 +7,8 @@ import {
 } from "react-router-dom";
 import LoginRegister from "./components/LoginRegister/LoginRegister";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
-import EditProfile from "./components/AdminDashboard/scenes/editProfile";
 import { LanguageProvider } from "./components/AdminDashboard/LanguageContext";
+import AddAdmin from "./components/AdminDashboard/scenes/addAdmin";
 
 function App() {
   // Helper function to check if the user is authenticated
@@ -30,7 +30,8 @@ function App() {
           />
           <Route path="/register" element={<LoginRegister />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/edit-profile" element={<EditProfile />} />
+          {/* <Route path="/edit-profile" element={<EditProfile />} /> */}
+          <Route path="/add-admin" element={<AddAdmin />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider>

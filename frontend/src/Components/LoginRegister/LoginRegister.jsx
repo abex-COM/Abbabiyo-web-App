@@ -118,6 +118,15 @@ const LoginRegister = () => {
       }
     }
   }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      navigate("/admin", { replace: true }); // Use replace to prevent re-submission on refresh
+
+      // If token exists, set it to the state or perform any necessary actions
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

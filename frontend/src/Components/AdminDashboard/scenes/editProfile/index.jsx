@@ -43,7 +43,7 @@ const editProfileTranslations = {
   am: {
     editProfileTitle: "መገለጫ አርትዕ",
     fullNameLabel: "ሙሉ ስም",
-    fullNameError: "ሙሉ ስም የፊደላት እና ቦታዎች ብቻ ሊይዝ �ለው",
+    fullNameError: "ሙሉ ስም የፊደላት እና ቦታዎች ብቻ ሊይዝ  ለው",
     emailLabel: "ኢሜይል",
     emailError: "ልክ ያልሆነ ኢሜይል",
     usernameLabel: "የተጠቃሚ ስም",
@@ -102,11 +102,11 @@ const EditProfile = () => {
   const [user, setUser] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { language } = useLanguage(); // Get the current language
+  const { language } = useLanguage();
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const userId = JSON.parse(atob(token.split(".")[1])).id;
-  // Fetch user data on component mount
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (!token) return;
@@ -128,28 +128,20 @@ const EditProfile = () => {
     fetchUserData();
   }, [language, userId]);
 
-  // Handle image selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create a preview URL for the selected image
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
-
-      // Update Formik's form data with the new file
       setUser((prevUser) => ({ ...prevUser, profileImage: file }));
     }
   };
 
-  // Handle form submission
   const handleFormSubmit = async (values, { resetForm }) => {
-    const token = localStorage.getItem("token");
     if (!token) {
       toast.error(editProfileTranslations[language].loginError);
       return;
     }
-
-    const userId = JSON.parse(atob(token.split(".")[1])).id;
 
     const formDataToSend = new FormData();
     formDataToSend.append("fullName", values.fullName);
@@ -163,7 +155,7 @@ const EditProfile = () => {
     }
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `${baseUrl}/api/admin/update-profile/${userId}`,
         formDataToSend,
         {
@@ -176,20 +168,16 @@ const EditProfile = () => {
 
       toast.success(editProfileTranslations[language].updateSuccess);
 
-      // Clear the preview after successful upload
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview);
         setImagePreview(null);
       }
 
-      // Reset the file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
 
-      // Clear inputs after successful update
       resetForm();
-      navigate(-1);
     } catch (err) {
       console.error(err);
       toast.error(
@@ -199,7 +187,6 @@ const EditProfile = () => {
     }
   };
 
-  // Clean up the object URL when component unmounts
   useEffect(() => {
     return () => {
       if (imagePreview) {
@@ -207,6 +194,7 @@ const EditProfile = () => {
       }
     };
   }, [imagePreview]);
+
   return (
     <Box m="20px">
       <ToastContainer
@@ -219,6 +207,7 @@ const EditProfile = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme={theme.palette.mode}
       />
 
       <Typography
@@ -238,6 +227,9 @@ const EditProfile = () => {
           borderRadius="50%"
           overflow="hidden"
           border={`2px solid ${colors.greenAccent[500]}`}
+          sx={{
+            boxShadow: `0 0 10px ${colors.greenAccent[500]}`,
+          }}
         >
           <img
             alt="profile-user"
@@ -261,11 +253,15 @@ const EditProfile = () => {
           component="label"
           sx={{
             backgroundColor: colors.greenAccent[500],
-            "&:hover": { backgroundColor: colors.greenAccent[600] },
+            "&:hover": {
+              backgroundColor: colors.greenAccent[600],
+              transform: "scale(1.05)",
+            },
             padding: "10px",
+            transition: "all 0.3s ease",
           }}
         >
-          <PhotoCameraIcon />
+          <PhotoCameraIcon sx={{ color: colors.grey[100] }} />
           <input
             type="file"
             hidden
@@ -314,7 +310,26 @@ const EditProfile = () => {
                   editProfileTranslations[language].fullNameError
                 }
                 variant="outlined"
-                sx={{ backgroundColor: colors.primary[400] }}
+                sx={{
+                  backgroundColor: colors.primary[400],
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: colors.grey[700],
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: colors.grey[300],
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: colors.greenAccent[500],
+                  },
+                }}
               />
 
               <TextField
@@ -331,7 +346,23 @@ const EditProfile = () => {
                   editProfileTranslations[language].emailError
                 }
                 variant="outlined"
-                sx={{ backgroundColor: colors.primary[400] }}
+                sx={{
+                  backgroundColor: colors.primary[400],
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: colors.grey[700],
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: colors.grey[300],
+                  },
+                }}
               />
 
               <TextField
@@ -348,7 +379,23 @@ const EditProfile = () => {
                   editProfileTranslations[language].usernameError
                 }
                 variant="outlined"
-                sx={{ backgroundColor: colors.primary[400] }}
+                sx={{
+                  backgroundColor: colors.primary[400],
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: colors.grey[700],
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: colors.grey[300],
+                  },
+                }}
               />
 
               <TextField
@@ -366,7 +413,23 @@ const EditProfile = () => {
                   editProfileTranslations[language].passwordError
                 }
                 variant="outlined"
-                sx={{ backgroundColor: colors.primary[400] }}
+                sx={{
+                  backgroundColor: colors.primary[400],
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: colors.grey[700],
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: colors.grey[300],
+                  },
+                }}
               />
 
               <TextField
@@ -384,7 +447,23 @@ const EditProfile = () => {
                   editProfileTranslations[language].confirmPasswordError
                 }
                 variant="outlined"
-                sx={{ backgroundColor: colors.primary[400] }}
+                sx={{
+                  backgroundColor: colors.primary[400],
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: colors.grey[700],
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: colors.grey[300],
+                  },
+                }}
               />
             </Box>
 
@@ -394,10 +473,14 @@ const EditProfile = () => {
                 variant="contained"
                 sx={{
                   backgroundColor: colors.greenAccent[500],
+                  color: colors.grey[100],
+                  fontWeight: "bold",
+                  padding: "10px 20px",
                   "&:hover": {
-                    transform: "none",
                     backgroundColor: colors.greenAccent[600],
+                    transform: "scale(1.05)",
                   },
+                  transition: "all 0.3s ease",
                 }}
               >
                 {editProfileTranslations[language].saveChanges}

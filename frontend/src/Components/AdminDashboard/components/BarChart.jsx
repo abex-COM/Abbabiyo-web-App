@@ -14,12 +14,12 @@ const BarChart = ({ data = [], isDashboard = false }) => {
 
   if (user.role === "superadmin") {
     formattedData = data.map((item) => ({
-      region: item.region, // from backend you send "region"
+      region: item.region,
       farmers: item.Farmers,
     }));
   } else if (user.role === "admin") {
     formattedData = data.map((item) => ({
-      region: item.woreda, // notice: map 'woreda' into 'region' field
+      region: item.woreda,
       farmers: item.Farmers,
     }));
   }
@@ -27,6 +27,11 @@ const BarChart = ({ data = [], isDashboard = false }) => {
   if (formattedData.length === 0) {
     return <div>No data available for the chart</div>;
   }
+
+  // Calculate the maximum farmer count
+  const maxFarmers = Math.max(...formattedData.map((item) => item.farmers), 0);
+  // Generate tick values from 0 to maxFarmers
+  const tickValues = Array.from({ length: maxFarmers + 1 }, (_, i) => i);
 
   return (
     <Box height="100%" width="100%">
@@ -42,9 +47,14 @@ const BarChart = ({ data = [], isDashboard = false }) => {
             },
           },
           legends: { text: { fill: colors.grey[100] } },
+          grid: {
+            line: {
+              stroke: "transparent", // This removes the grid lines
+            },
+          },
         }}
         keys={["farmers"]}
-        indexBy="region" // Always index by 'region' (even for woreda admins)
+        indexBy="region"
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
         valueScale={{ type: "linear" }}
@@ -71,7 +81,10 @@ const BarChart = ({ data = [], isDashboard = false }) => {
           legend: isDashboard ? undefined : "Number of Farmers",
           legendPosition: "middle",
           legendOffset: -40,
+          format: (value) => Math.floor(value),
+          tickValues: tickValues, // Use our generated tick values
         }}
+        enableGridY={false} // This completely disables the y-axis grid lines
         enableLabel={false}
         legends={[
           {

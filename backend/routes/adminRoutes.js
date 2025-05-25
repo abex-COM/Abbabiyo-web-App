@@ -10,6 +10,8 @@ const {
   getAdminById,
   getAdmins,
   getDashboardData,
+  getAllWoredas,
+  downloadReport,
 } = require("../controllers/adminController");
 const upload = require("../middleware/upload");
 const authController = require("../controllers/authController");
@@ -48,5 +50,10 @@ router.get(
   roleMiddleware(["admin", "superadmin"]),
   getFramersperZone
 );
+
+router.get("/getUsersworedas", getAllWoredas);
+
+// 2. Download report for a woreda (CSV for demo)
+router.get("/download-report", downloadReport);
 
 module.exports = router;

@@ -17,6 +17,7 @@ import { useLanguage } from "../../LanguageContext";
 import { MenuItem } from "@mui/material"; // Make sure this import exists
 import { ethiopianZones } from "../../../../constants/ethiopianData";
 import baseUrl from "../../../../baseUrl/baseUrl";
+import { useNavigate } from "react-router-dom";
 
 // Translation dictionary
 const addAdminTranslations = {
@@ -106,6 +107,7 @@ const AddAdmin = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { language } = useLanguage();
 
+  const navigation = useNavigate();
   const handleFormSubmit = async (values, { resetForm }) => {
     try {
       const token = localStorage.getItem("token");
@@ -119,7 +121,9 @@ const AddAdmin = () => {
       toast.success(
         response.data.message || addAdminTranslations[language].success
       );
+
       resetForm();
+      navigation(-1);
     } catch (error) {
       console.error(
         "Error creating admin:",

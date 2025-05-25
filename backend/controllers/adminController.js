@@ -1,5 +1,4 @@
 const Admin = require("../models/adminModel");
-const bcrypt = require("bcryptjs");
 const User = require("../models/userModel"); // Adjust based on your model
 
 const fs = require("fs");
@@ -210,9 +209,58 @@ const getDashboardData = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const getAllWoredas = async (req, res) => {
+  try {
+    const { zone } = req.query;
+    if (!zone) {
+      return res.status(400).json({ error: "Zone is required" });
+    }
+
+    const users = await User.find({ "location.zone": zone }, "location.woreda");
+
+    // Extract woreda names and remove duplicates
+    const woredas = [
+      ...new Set(users.map((user) => user.location?.woreda).filter(Boolean)),
+    ];
+
+    res.json(woredas);
+  } catch (err) {
+    console.error("Failed to fetch woredas:", err);
+    res.status(500).json({ error: "Failed to fetch woredas" });
+  }
+};
+
+const downloadReport = async (req, res) => {
+  const { woreda } = req.query;
+  if (!woreda) return res.status(400).json({ error: "Woreda is required" });
+
+  try {
+    const farmers = await User.find({ "location.woreda": woreda });
+
+    // CSV Header
+    let csv = "Name,Phone Number,Region,Zone,Woreda\n";
+
+    // CSV Rows
+    farmers.forEach((f) => {
+      csv += `"${f.name}","${f.phoneNumber}","${f.location.region}","${f.location.zone}","${f.location.woreda}"\n`;
+    });
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=report-${woreda}.csv`
+    );
+    res.send(csv);
+  } catch (err) {
+    console.error("CSV generation error:", err);
+    res.status(500).json({ error: "Failed to generate report" });
+  }
+};
 
 module.exports = {
+  getAllWoredas,
   createAdmin,
+  downloadReport,
   updateAdmin,
   deleteAdmin,
   getAdmins,
