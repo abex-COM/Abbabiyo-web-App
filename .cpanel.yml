@@ -5,10 +5,10 @@ deployment:
 
     - export FRONTEND_SRC=frontend
     - export FRONTEND_BUILD_DIR=dist
-    - export FRONTEND_DEPLOY_PATH=/home/deployed-app-web/public_html
+    - export FRONTEND_DEPLOY_PATH=/home/abdikoue/deployed-app-web/public_html
 
     - export BACKEND_SRC=backend
-    - export BACKEND_DEPLOY_PATH=/home/deployed-app-web/backend
+    - export BACKEND_DEPLOY_PATH=/home/abdikoue/deployed-app-web/backend
 
     # Build frontend
     - cd $FRONTEND_SRC
