@@ -1,5 +1,8 @@
 deployment:
   tasks:
+    - mkdir -p /home/deployed-app-web/public_html
+    - mkdir -p /home/deployed-app-web/backend
+
     - export FRONTEND_SRC=frontend
     - export FRONTEND_BUILD_DIR=dist
     - export FRONTEND_DEPLOY_PATH=/home/deployed-app-web/public_html
