@@ -1,0 +1,26 @@
+deployment:
+  tasks:
+    - export FRONTEND_SRC=frontend
+    - export FRONTEND_BUILD_DIR=dist
+    - export FRONTEND_DEPLOY_PATH=/home/deployed-app-web/public_html
+
+    - export BACKEND_SRC=backend
+    - export BACKEND_DEPLOY_PATH=/home/deployed-app-web/backend
+
+    # Build frontend
+    - cd $FRONTEND_SRC
+    - npm install
+    - npm run build
+
+    # Copy frontend dist to public_html
+    - /bin/cp -R $FRONTEND_BUILD_DIR/* $FRONTEND_DEPLOY_PATH
+
+    # Copy backend files
+    - /bin/cp -R ../$BACKEND_SRC/* $BACKEND_DEPLOY_PATH
+
+    # Install backend dependencies (if Node.js)
+    - cd $BACKEND_DEPLOY_PATH
+    - npm install
+
+    # Restart backend (optional, if needed)
+    - touch restart.txt
